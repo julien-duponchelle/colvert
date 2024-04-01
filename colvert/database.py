@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 import duckdb
 
@@ -18,13 +19,22 @@ class Database:
         if file.endswith(".csv"):
             filename = os.path.basename(file)
             table_name = os.path.splitext(filename)[0]
-            self.sql(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto('{file}')")
+            table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
+            self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto(?)", [file])
             self.sql(f"SELECT * FROM {table_name}")
     
     def tables(self):
         tables = self.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main'")
         tables = tables.fetchall()
         return [table[0] for table in tables]
+
+    def execute(self, sql: str, params: list):
+        logging.info(sql)
+        try:
+            result = self._db.execute(sql, params)
+        except duckdb.ParserException as e:
+            raise ParseError(e)
+        return result
 
     def sql(self, sql: str):
         logging.info(sql)

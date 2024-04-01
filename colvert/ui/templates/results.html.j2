@@ -1,8 +1,8 @@
 <table class="table table-striped">
-    <thead>
+    <thead class="sticky-top">
         <tr>
             {% for column in columns %}
-                <th>{{ column }}</th>
+                <th scope="col">{{ column }}</th>
             {% endfor %}
         </tr>
     </thead>
