@@ -7,8 +7,9 @@
 
 **Table of Contents**
 
-- [Installation](#installation)
-- [License](#license)
+- [Colvert](#colvert)
+  - [Installation](#installation)
+  - [License](#license)
 
 ## Installation
 
@@ -18,4 +19,4 @@ pip install colvert
 
 ## License
 
-`colvert` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`colvert` is distributed under the terms of the Apache 2.0 license.
