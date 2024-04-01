@@ -4,6 +4,10 @@ import os
 import duckdb
 
 
+class ParseError(duckdb.ParserException):
+    pass
+
+
 class Database:
     def __init__(self) -> None:
         self._db = duckdb.connect(":memory:")
@@ -24,6 +28,9 @@ class Database:
 
     def sql(self, sql: str):
         logging.info(sql)
-        result = self._db.sql(sql)
+        try:
+            result = self._db.sql(sql)
+        except duckdb.ParserException as e:
+            raise ParseError(e)
         return result
             

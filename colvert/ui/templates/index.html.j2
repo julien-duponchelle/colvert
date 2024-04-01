@@ -36,7 +36,10 @@
             }
         });
         editor.onDidChangeModelContent(function () {
-            document.querySelector('input[name=q]').value = editor.getValue();
+            const input = document.querySelector('input[name=q]');
+            input.value = editor.getValue();
+            const results = document.getElementById('results');
+            results.dispatchEvent(new Event('sql-change'));
         });
     });
 </script>
@@ -45,10 +48,6 @@
     type="hidden"
     name="q"
     value="{{ query }}"
-    hx-trigger="keyup changed delay:1s"
-    hx-get="/results"
-    hx-swap="innerHtml"
-    hx-target="#results"
 >
 
 <div id="search" style="height: 155px;"></div>
@@ -56,7 +55,7 @@
 <div
     id="results"
     hx-get="/results"
-    hx-trigger="load"
+    hx-trigger="load, sql-change delay:500ms"
     hx-swap="innerHtml"
     hx-include="input[name=q]"
 >
