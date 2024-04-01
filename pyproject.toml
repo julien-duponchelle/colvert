@@ -28,6 +28,9 @@ classifiers = [
 [tool.hatch.metadata.hooks.requirements_txt]
 files = ["requirements.txt"]
 
+[project.scripts]
+colvert = "colvert.__main__:main"
+
 [project.urls]
 Documentation = "https://github.com/julien-duponchelle/colvert#readme"
 Issues = "https://github.com/julien-duponchelle/colvert/issues"
