@@ -54,13 +54,12 @@
         name="q"
         value="{{ query }}"
     >
+    <label for="chart" class="form-label">Chart type</label>
     <select name="chart" class="form-select" onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))">
         <option value="table">Table</option>
         <option value="pie">Pie Chart</option>
     </select>
 </div>
-
-
 
 <div
     id="results"
