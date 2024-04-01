@@ -21,7 +21,6 @@ class Database:
             table_name = os.path.splitext(filename)[0]
             table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
             self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto(?)", [file])
-            self.sql(f"SELECT * FROM {table_name}")
     
     def tables(self):
         tables = self.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main'")
@@ -32,7 +31,7 @@ class Database:
         logging.info(sql)
         try:
             result = self._db.execute(sql, params)
-        except duckdb.ParserException as e:
+        except duckdb.ProgrammingError as e:
             raise ParseError(e)
         return result
 
@@ -40,7 +39,7 @@ class Database:
         logging.info(sql)
         try:
             result = self._db.sql(sql)
-        except duckdb.ParserException as e:
+        except duckdb.ProgrammingError as e:
             raise ParseError(e)
         return result
             
