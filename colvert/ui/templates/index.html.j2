@@ -22,6 +22,7 @@
             language: 'sql',
             lineNumbers: false,
             minimap: { enabled: false },
+            automaticLayout: true,
             wordWrap: 'on',
             contextmenu: false,
             scrollbar: { vertical: 'hidden' },
@@ -50,7 +51,8 @@
     value="{{ query }}"
 >
 
-<div id="search" style="height: 155px;"></div>
+<div id="search" style="height: 150px; overflow: auto; resize: vertical;"></div>
+
 
 <div
     id="results"
