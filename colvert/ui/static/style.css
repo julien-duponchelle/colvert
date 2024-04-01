@@ -1,0 +1,11 @@
+/**
+ * The `--tblr-primary-fg` variable defines the foreground color for primary elements in the table.
+ * This variable is used to set the text color of primary elements such as headers, labels, or important text in a table.
+ */
+:root {
+    --tblr-primary: #012437;
+}
+
+.navbar {
+    --tblr-navbar-bg: #012437;
+}

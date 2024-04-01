@@ -1,0 +1,6 @@
+aiohttp>=3.8.5
+aiohttp-jinja2>=1.5.1
+rocher>=0.44.0
+click>=8.1.7
+colorama>=0.4.6 
+duckdb>=0.10.1

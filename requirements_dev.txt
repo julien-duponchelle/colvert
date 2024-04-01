@@ -1,0 +1,7 @@
+-r requirements.txt
+aiohttp-devtools
+pytest-aiohttp
+ruff
+pyright
+build
+hatch

@@ -1,0 +1,65 @@
+{% extends "layout.html.j2" %}
+
+{% block container %}container-full{% endblock %}
+
+{% block body %}
+
+<script src="/static/vs/loader.js"></script>
+<script>
+    require.config({ paths: { vs: '/static/vs' } });
+    require(['vs/editor/editor.main'], function () {
+        monaco.editor.defineTheme("colvertTheme", {
+            base: "vs",
+            inherit: true,
+            rules: [
+                { token: "operator", foreground: "FF0000" },
+            ],
+            colors: {},
+        });
+        editor = monaco.editor.create(document.getElementById('search'), {
+            theme: 'colvertTheme',
+            value: {{ query| tojson }},
+            language: 'sql',
+            lineNumbers: false,
+            minimap: { enabled: false },
+            wordWrap: 'on',
+            contextmenu: false,
+            scrollbar: { vertical: 'hidden' },
+            renderLineHighlight: 'none',
+            padding: { top: 10, bottom: 10 },
+            lineDecorationsWidth: 0,
+            overviewRulerLanes: 0,
+            wordBasedSuggestions: "off",
+            quickSuggestions: {
+                other: true,
+                strings: true
+            }
+        });
+        editor.onDidChangeModelContent(function () {
+            document.querySelector('input[name=q]').value = editor.getValue();
+        });
+    });
+</script>
+
+<input
+    type="hidden"
+    name="q"
+    value="{{ query }}"
+    hx-trigger="keyup changed delay:1s"
+    hx-get="/results"
+    hx-swap="innerHtml"
+    hx-target="#results"
+>
+
+<div id="search" style="height: 155px;"></div>
+
+<div
+    id="results"
+    hx-get="/results"
+    hx-trigger="load"
+    hx-swap="innerHtml"
+    hx-include="input[name=q]"
+>
+</div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "colvert"
+dynamic = ["version", "dependencies"]
+description = 'A frontend to DuckDB'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+keywords = []
+authors = [
+  { name = "Julien Duponchelle", email = "julien@duponchelle.info" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[project.urls]
+Documentation = "https://github.com/julien-duponchelle/colvert#readme"
+Issues = "https://github.com/julien-duponchelle/colvert/issues"
+Source = "https://github.com/julien-duponchelle/colvert"
+
+[tool.hatch.version]
+path = "colvert/__init__.py"
+
+[tool.hatch.envs.lint]
+detached = true
+dependencies = [
+  "ruff>=0.0.243",
+]
+
+[tool.hatch.build]
+exclude = [
+  "/.github",
+]
