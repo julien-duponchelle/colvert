@@ -4,3 +4,5 @@ rocher>=0.44.0
 click>=8.1.7
 colorama>=0.4.6 
 duckdb>=0.10.1
+plotly>=5.20.0
+pandas>=2.2.1 # Required by plotly express

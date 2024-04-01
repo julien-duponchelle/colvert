@@ -4,6 +4,7 @@
 
 {% block body %}
 
+<script src="/plotly.js"></script>
 <script src="/static/vs/loader.js"></script>
 <script>
     require.config({ paths: { vs: '/static/vs' } });
@@ -45,13 +46,20 @@
     });
 </script>
 
-<input
-    type="hidden"
-    name="q"
-    value="{{ query }}"
->
-
 <div id="search" style="height: 150px; overflow: auto; resize: vertical;"></div>
+
+<div id="form" class="mb-2">
+    <input
+        type="hidden"
+        name="q"
+        value="{{ query }}"
+    >
+    <select name="chart" class="form-select" onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))">
+        <option value="table">Table</option>
+        <option value="pie">Pie Chart</option>
+    </select>
+</div>
+
 
 
 <div
@@ -59,7 +67,7 @@
     hx-get="/results"
     hx-trigger="load, sql-change delay:500ms"
     hx-swap="innerHtml"
-    hx-include="input[name=q]"
+    hx-include="#form input, #form select"
 >
 </div>
 
