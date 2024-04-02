@@ -64,7 +64,6 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         var suggestions = data.map(function (suggestion) {
                             return  {
                                 label: suggestion['label'],
@@ -84,28 +83,41 @@
     });
 </script>
 
-<div id="search" style="height: 150px; overflow: auto; resize: vertical;"></div>
-
-<div id="form" class="mb-2">
-    <input
-        type="hidden"
-        name="q"
-        value="{{ query }}"
-    >
-    <label for="chart" class="form-label">Chart type</label>
-    <select name="chart" class="form-select" onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))">
-        <option value="table">Table</option>
-        <option value="pie">Pie Chart</option>
-    </select>
+<div class="col-s-12 col-lg-9">
+    <div class="card">
+        <div id="search" style="height: 150px; overflow: auto; resize: vertical; card-body"></div>
+    </div>
 </div>
 
-<div
-    id="results"
-    hx-get="/results"
-    hx-trigger="load, sql-change delay:500ms"
-    hx-swap="innerHtml"
-    hx-include="#form input, #form select"
->
+<div class="col-s-12 col-lg-3">
+    <div id="form" class="card">
+        <input
+            type="hidden"
+            name="q"
+            value="{{ query }}"
+        >
+        <div class="card-body">
+            <label for="chart" class="form-label">Chart type</label>
+            <select name="chart" class="form-select" onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))">
+                <option value="table">Table</option>
+                <option value="pie">Pie Chart</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <div class="card">
+        <div
+            id="results"
+            class="card-body"    
+            hx-get="/results"
+            hx-trigger="load, sql-change delay:500ms"
+            hx-swap="innerHtml"
+            hx-include="#form input, #form select"
+        >
+        </div>
+    </div>
 </div>
 
 {% endblock %}

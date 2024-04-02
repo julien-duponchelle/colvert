@@ -21,9 +21,14 @@
     </nav>
   </header>
   <main>
-    <div class="{% block container %}container{% endblock %}">
-      {% block body %}
-      {% endblock %}
+    <div class="page-wrapper">
+      <div class="page-body">
+        <div class="container-fluid">
+          <div class="row row-deck row-cards">
+            {% block body %}
+            {% endblock %}
+          </div>
+        </div>
     </div>
   </main>
 </body>
