@@ -43,6 +43,44 @@
             const results = document.getElementById('results');
             results.dispatchEvent(new Event('sql-change'));
         });
+
+        monaco.languages.registerCompletionItemProvider("sql", {
+            provideCompletionItems: function (model, position) {
+                return new Promise(function (resolve, reject) {
+                    var textUntilPosition = model.getValueInRange({
+                        startLineNumber: 1,
+                        startColumn: 1,
+                        endLineNumber: position.lineNumber,
+                        endColumn: position.column
+                    });
+                    fetch('/completion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            q: textUntilPosition
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        var suggestions = data.map(function (suggestion) {
+                            return  {
+                                label: suggestion['label'],
+                                insertText: suggestion['text'],
+                                kind: Reflect.get(monaco.languages.CompletionItemKind, suggestion['kind']),
+                            };
+                        });
+                        resolve({ suggestions: suggestions });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        reject({ suggestions: [] })
+                    });
+                });
+            }
+        });
     });
 </script>
 

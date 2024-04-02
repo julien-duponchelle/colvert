@@ -9,7 +9,7 @@ async def index(request):
     query = request.query.get("q", "")
     first_table = request.app["db"].tables()[0]
     if query == "":
-        query = f"SELECT *\nFROM '{first_table}'\nLIMIT 10"
+        query = f"SELECT *\nFROM {first_table}\nLIMIT 10"
     return {
         "query": query,
     }
