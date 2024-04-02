@@ -51,6 +51,8 @@ def table(request, result) -> web.Response:
 def render_chart(chart, result) -> web.Response:
     if chart == "pie":
         return pie_chart(result)
+    elif chart == "line":
+        return line_chart(result)
     else:
         raise ValueError("Invalid chart type")
     
@@ -62,6 +64,20 @@ def pie_chart(result) -> web.Response:
         raise ValueError(f"Pie chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
     fig = px.pie(result.df(), values=result.description[0][0], names=result.description[1][0])
     return render(fig)
+
+def line_chart(result) -> web.Response:
+    example_query = "Example: SELECT COUNT(*) as score, column FROM table GROUP BY ALL"
+    if len(result.description) not in (2, 3):
+        raise ValueError("Line chart need two or three columns." + example_query)
+    if result.description[0][1] != "NUMBER":
+        raise ValueError(f"Line chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
+    df = result.df()
+    if len(result.description) == 3:
+        fig = px.line(df, x=result.description[1][0], y=result.description[0][0], color=result.description[2][0])
+    else:
+        fig = px.line(df, x=result.description[1][0], y=result.description[0][0])
+    return render(fig)
+
 
 def render(fig) -> web.Response:
     html = fig.to_html(full_html=False, include_plotlyjs=False)

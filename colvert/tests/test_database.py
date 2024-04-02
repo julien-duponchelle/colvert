@@ -20,10 +20,10 @@ class TestDatabase:
         assert db.tables() == ["test"]
 
     def test_execute(self, db):
-        assert db.execute("SELECT COUNT(*) FROM test", []).fetchone()[0] == 6
+        assert db.execute("SELECT COUNT(*) FROM test", []).fetchone()[0] == 8
 
     def test_sql(self, db):
-        assert db.execute("SELECT COUNT(*) FROM test", []).fetchone()[0] == 6
+        assert db.execute("SELECT COUNT(*) FROM test", []).fetchone()[0] == 8
 
     def test_complete(self, db):
         suggestions = db.complete("SELECT * FROM te")
