@@ -50,14 +50,21 @@ class Database:
         completions = []
         for row in result.fetchall():
             kind = "Text"
-            if re.match("^[A-Z ]+$", row[0]):
+            val = row[0]
+            if re.match("^[A-Z ]+$", val):
                 kind = "Keyword"
-            elif row[0] in self.tables():
+            elif val in self.tables():
                 kind = "Class"
-            elif row[0][-1:] == "/":
+            elif val[-1:] == "/":
                 kind = "File"
-            elif row[0][-1:] == "'":
+            elif val[-1:] == "'":
                 kind = "File"
-            completions.append((kind, row[0]))
-        print(completions)
+
+            # Prevent double quotes from being if double quotes are
+            # already present in the query
+            if val[0] == '"' and val[-1:] == '"':
+                kind = "Field"
+                if re.search(r'"[^"]*$', query):
+                    val = val[1:-1]
+            completions.append((kind, val))
         return completions

@@ -37,3 +37,6 @@ class TestDatabase:
 
         suggestions = db.complete("SELECT * FROM read_csv_auto('samples/te")
         assert ('File', 'test.csv\'') in suggestions
+
+        suggestions = db.complete('SELECT * FROM test WHERE Fir')
+        assert ('Field', '"First Name"') in suggestions
