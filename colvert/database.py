@@ -18,11 +18,15 @@ class Database:
     def load_file(self, file: str) -> None:
         # TODO: Add support for other file types
         # TODO: handle unknown file types
-        if file.endswith(".csv"):
-            filename = os.path.basename(file)
-            table_name = os.path.splitext(filename)[0]
-            table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
+        filename = os.path.basename(file)
+        table_name = os.path.splitext(filename)[0]
+        table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
+        if file.endswith(".csv"):    
             self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto(?)", [file])
+        elif file.endswith(".parquet"):
+            self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_parquet(?)", [file])
+        else:
+            raise ValueError(f"Unknown file type: {file}")
     
     def tables(self):
         tables = self._db.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main'")
@@ -41,7 +45,7 @@ class Database:
         logging.info(sql)
         try:
             result = self._db.sql(sql)
-        except duckdb.ProgrammingError as e:
+        except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException) as e:
             raise ParseError(e)
         return result
     

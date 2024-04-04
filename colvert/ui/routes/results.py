@@ -29,7 +29,11 @@ async def index(request):
         return aiohttp_jinja2.render_template('error.html.j2', request, {
             "error": str(e),
         })
-    if chart_type == "table":
+    if result is None:
+        return aiohttp_jinja2.render_template('info.html.j2', request, {
+            "message": "No results",
+        })
+    elif chart_type == "table":
         return table(request, result)
     else:
         try:
@@ -37,7 +41,7 @@ async def index(request):
         except ValueError as e:
             logging.error(e)
             return aiohttp_jinja2.render_template('error.html.j2', request, {
-                "error": str(e),
+                "message": str(e),
             })
 
 def table(request, result) -> web.Response:
