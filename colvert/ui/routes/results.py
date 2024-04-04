@@ -7,6 +7,8 @@ from plotly.offline.offline import get_plotlyjs
 
 from ...database import ParseError
 
+ROW_LIMIT = 1000
+
 routes = web.RouteTableDef()
 
 @routes.get("/plotly.js")
@@ -27,7 +29,7 @@ async def index(request):
     except ParseError as e:
         logging.error(e)
         return aiohttp_jinja2.render_template('error.html.j2', request, {
-            "error": str(e),
+            "message": str(e),
         })
     if result is None:
         return aiohttp_jinja2.render_template('info.html.j2', request, {
@@ -47,7 +49,7 @@ async def index(request):
 def table(request, result) -> web.Response:
     context = {
         "columns": [ d[0] for d in result.description ],
-        "rows": result.fetchall(),
+        "rows": result.limit(ROW_LIMIT).fetchall(),
     }
     template = "table.html.j2"
     return aiohttp_jinja2.render_template(template, request, context)
@@ -66,7 +68,13 @@ def pie_chart(result) -> web.Response:
         raise ValueError("Pie chart need exactly two columns." + example_query)
     if result.description[0][1] != "NUMBER":
         raise ValueError(f"Pie chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
-    fig = px.pie(result.df(), values=result.description[0][0], names=result.description[1][0])
+    
+    limit = 11
+    df = result.limit(limit).df()
+    if len(df) == limit:
+        raise ValueError(f"Pie chart need less than {limit} rows.")
+    
+    fig = px.pie(df, values=result.description[0][0], names=result.description[1][0])
     return render(fig)
 
 def line_chart(result) -> web.Response:
@@ -75,7 +83,8 @@ def line_chart(result) -> web.Response:
         raise ValueError("Line chart need two or three columns." + example_query)
     if result.description[0][1] != "NUMBER":
         raise ValueError(f"Line chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
-    df = result.df()
+    df = result.limit(ROW_LIMIT).df()
+    #TODO: Raise error if too many rows
     if len(result.description) == 3:
         fig = px.line(df, x=result.description[1][0], y=result.description[0][0], color=result.description[2][0])
     else:
