@@ -1,7 +1,7 @@
 import pytest
 
 from ...database import Database
-from ...ui.charts import Pie
+from ...ui.charts import Line, Pie
 
 
 class TestCharts:
@@ -24,6 +24,13 @@ class TestCharts:
     def test_render_pie(self, db):
         result = db.sql("SELECT COUNT(*),'First Name' FROM test")
         response = Pie(result).build()
+        assert response.status == 200
+        assert response.text
+        assert 'plotly-graph-div' in response.text
+
+    def test_render_line(self, db):
+        result = db.sql("SELECT COUNT(*),'First Name' FROM test")
+        response = Line(result).build()
         assert response.status == 200
         assert response.text
         assert 'plotly-graph-div' in response.text
