@@ -3,10 +3,33 @@ import os
 import re
 
 import duckdb
+import pandas
 
 
 class ParseError(duckdb.ParserException):
     pass
+
+
+class Result:
+    """
+    Wrapper around duckdb result
+    """
+    def __init__(self, result) -> None:
+        self.result = result
+        self.column_names = [d[0] for d in result.description]
+        self.column_types = [d[1] for d in result.description]
+    
+    def fetchall(self):
+        return self.result.fetchall()
+
+    def fetchone(self):
+        return self.result.fetchone()
+    
+    def limit(self, limit: int) -> "Result":
+        return Result(self.result.limit(limit))
+    
+    def df(self) -> pandas.DataFrame:
+        return self.result.df()
 
 
 class Database:
@@ -39,7 +62,7 @@ class Database:
             result = self._db.execute(sql, params)
         except duckdb.ProgrammingError as e:
             raise ParseError(e)
-        return result
+        return Result(result)
 
     def sql(self, sql: str):
         logging.info(sql)
@@ -47,7 +70,7 @@ class Database:
             result = self._db.sql(sql)
         except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException) as e:
             raise ParseError(e)
-        return result
+        return Result(result)
     
     def complete(self, query: str) -> list[tuple[str, str]]:
         result = self._db.execute("SELECT * FROM sql_auto_complete(?)", [query])

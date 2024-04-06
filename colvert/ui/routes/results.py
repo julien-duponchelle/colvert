@@ -1,11 +1,11 @@
 import logging
 
 import aiohttp_jinja2
-import plotly.express as px
 from aiohttp import web
 from plotly.offline.offline import get_plotlyjs
 
 from ...database import ParseError
+from .. import charts
 
 ROW_LIMIT = 1000
 
@@ -46,53 +46,16 @@ async def index(request):
                 "message": str(e),
             })
 
+def render_chart(chart_type, result):
+    for chart in charts.__all__:
+        if chart_type == chart.lower():
+            return getattr(charts, chart)(result).build()
+    raise ValueError(f"Unknown chart type: {chart_type}")
+
 def table(request, result) -> web.Response:
     context = {
-        "columns": [ d[0] for d in result.description ],
+        "columns": result.column_names,
         "rows": result.limit(ROW_LIMIT).fetchall(),
     }
     template = "table.html.j2"
     return aiohttp_jinja2.render_template(template, request, context)
-
-def render_chart(chart, result) -> web.Response:
-    if chart == "pie":
-        return pie_chart(result)
-    elif chart == "line":
-        return line_chart(result)
-    else:
-        raise ValueError("Invalid chart type")
-    
-def pie_chart(result) -> web.Response:
-    example_query = "Example: SELECT COUNT(*) as score, column FROM table GROUP BY ALL"
-    if len(result.description) != 2:
-        raise ValueError("Pie chart need exactly two columns." + example_query)
-    if result.description[0][1] != "NUMBER":
-        raise ValueError(f"Pie chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
-    
-    limit = 11
-    df = result.limit(limit).df()
-    if len(df) == limit:
-        raise ValueError(f"Pie chart need less than {limit} rows.")
-    
-    fig = px.pie(df, values=result.description[0][0], names=result.description[1][0])
-    return render(fig)
-
-def line_chart(result) -> web.Response:
-    example_query = "Example: SELECT COUNT(*) as score, column FROM table GROUP BY ALL"
-    if len(result.description) not in (2, 3):
-        raise ValueError("Line chart need two or three columns." + example_query)
-    if result.description[0][1] != "NUMBER":
-        raise ValueError(f"Line chart need a numeric column as first column got {result.description[0][1]}. {example_query}")
-    df = result.limit(ROW_LIMIT).df()
-    #TODO: Raise error if too many rows
-    if len(result.description) == 3:
-        fig = px.line(df, x=result.description[1][0], y=result.description[0][0], color=result.description[2][0])
-    else:
-        fig = px.line(df, x=result.description[1][0], y=result.description[0][0])
-    return render(fig)
-
-
-def render(fig) -> web.Response:
-    html = fig.to_html(full_html=False, include_plotlyjs=False)
-    return web.Response(text=html, content_type="text/html")
-    
