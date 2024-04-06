@@ -12,18 +12,18 @@ ROW_LIMIT = 1000
 routes = web.RouteTableDef()
 
 @routes.get("/plotly.js")
-async def plotly_js(request):
-
+async def plotly_js(request) -> web.Response:
     return web.Response(
         text=get_plotlyjs(),
         content_type="application/javascript",
     )
 
 
-@routes.get("/results")
-async def index(request):
-    query = request.query.get("q", "")
-    chart_type = request.query.get("chart", "table")
+@routes.post("/results")
+async def index(request: web.Request) -> web.Response:
+    post = await request.post()
+    query = post.get("q", "")
+    chart_type = post.get("chart", "table")
     try:
         result = request.app["db"].sql(query)
     except ParseError as e:
