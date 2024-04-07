@@ -50,10 +50,11 @@ class Database:
 
     def load_file(self, file: str) -> None:
         # TODO: Add support for other file types
-        # TODO: handle unknown file types
         filename = os.path.basename(file)
         table_name = os.path.splitext(filename)[0]
         table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
+        if table_name[0].isdigit(): # Table names cannot start with a digit
+            table_name = f"table_{table_name}"
         if file.endswith(".csv"):    
             self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto(?)", [file])
         elif file.endswith(".parquet"):

@@ -6,7 +6,7 @@ from colvert.ui import setup_app
 
 
 @pytest_asyncio.fixture(scope="session")
-def sample_db() -> aiohttp.web.Application:
+def sample_db() -> Database:
     db = Database()
     db.load_file("./samples/test.csv")
     return db
