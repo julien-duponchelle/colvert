@@ -11,3 +11,8 @@
 .navbar {
     --tblr-navbar-bg: #1e3701;
 }
+
+.table-responsive {
+ scrollbar-color: black white;
+ overflow-x: scroll;
+}
