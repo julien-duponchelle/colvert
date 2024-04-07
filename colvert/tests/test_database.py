@@ -54,3 +54,8 @@ class TestDatabase:
 
         suggestions = db.complete('SELECT * FROM test WHERE Fir')
         assert ('Field', '"First Name"') in suggestions
+
+    def test_describe(self, db):
+        res = db.describe("test")
+        assert len(res) == 5
+        assert res[0]['column_name'] == "Id"

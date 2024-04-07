@@ -19,5 +19,5 @@ class Table(Base):
             "rows": self._row_iterator(df),
             "length": len(df),
         }
-        template = "table.html.j2"
+        template = "charts/table.html.j2"
         return await self.render_template(template, context)

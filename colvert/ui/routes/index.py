@@ -18,3 +18,17 @@ async def index(request) -> dict[str, str]:
         "query": query,
     }
 
+
+
+@routes.get("/tables")
+@aiohttp_jinja2.template(template_name="tables.html.j2")
+async def tables(request):
+    tables = []
+    for table in request.app["db"].tables():
+        tables.append({
+            "name": table,
+            "columns": request.app["db"].describe(table),
+        })
+    return {
+        "tables": tables,
+    }

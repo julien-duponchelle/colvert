@@ -1,0 +1,32 @@
+{% extends "layout.html.j2" %}
+
+{% block container %}container-full{% endblock %}
+
+
+{% block body %}
+    {% for table in tables %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">{{ table['name'] }}</h5>
+            </div>
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        {% for field in table['columns'][0] %}
+                            <th>{{ field  | replace('_', ' ') }}</th>
+                        {% endfor %}
+                    </thead>
+                    <tbody>
+                        {% for column in table['columns'] %}
+                            <tr>
+                                {% for value in column.values() %}
+                                    <td>{{ value }}</th>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

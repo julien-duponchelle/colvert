@@ -16,3 +16,7 @@
  scrollbar-color: black white;
  overflow-x: scroll;
 }
+
+.navbar-dark .navbar-nav .nav-link {
+    color: white;
+}

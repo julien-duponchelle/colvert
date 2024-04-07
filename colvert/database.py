@@ -52,7 +52,7 @@ class Database:
         # TODO: Add support for other file types
         filename = os.path.basename(file)
         table_name = os.path.splitext(filename)[0]
-        table_name = re.sub(r"[^a-zA-Z0-9_]", "_", table_name)
+        table_name = self._escape(table_name)
         if table_name[0].isdigit(): # Table names cannot start with a digit
             table_name = f"table_{table_name}"
         if file.endswith(".csv"):    
@@ -61,9 +61,28 @@ class Database:
             self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_parquet(?)", [file])
         else:
             raise ValueError(f"Unknown file type: {file}")
-    
+
+    def _escape(self, value: str) -> str:
+        """
+        Brutally escape a string for use in SQL as a table or column name
+
+        For paremeters, use prepared statements
+        """
+        return re.sub(r"[^a-zA-Z0-9_]", "_", value)
+
+    def describe(self, table: str):
+        table = self._escape(table)
+        result =  self.sql(f"DESCRIBE {table}")
+        rows = []
+        for row in result.fetchall():
+            field = {}
+            for idx, col in enumerate(result.column_names):
+                field[col] = row[idx]
+            rows.append(field)
+        return rows
+
     def tables(self):
-        tables = self._db.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main'")
+        tables = self._db.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name ASC")
         tables = tables.fetchall()
         return [table[0] for table in tables]
 
