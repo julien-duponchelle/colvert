@@ -115,14 +115,19 @@
     </div>
 </div>
 
-<div
-    id="results"
-    class="col-12"
-    hx-post="/results"
-    hx-trigger="load, sql-change delay:500ms"
-    hx-swap="innerHtml"
-    hx-include="#form input, #form select"
->
-</div>
+<span id="loader">
+    <div class="loading">
+        <h3>Loading<span class="animated-dots"></span></h3>
+    </div>
+    <div
+        id="results"
+        class="col-12"
+        hx-post="/results"
+        hx-trigger="load, sql-change delay:500ms"
+        hx-swap="innerHtml"
+        hx-include="#form input, #form select"
+        hx-indicator="#loader">
+    </div>
+</span>
 
 {% endblock %}

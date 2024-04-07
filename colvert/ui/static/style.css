@@ -20,3 +20,17 @@
 .navbar-dark .navbar-nav .nav-link {
     color: white;
 }
+
+.loading {
+    display: none;
+}
+.htmx-request .loading {
+    display: inline;
+}
+.htmx-request.loading {
+    display: inline;
+}
+
+.htmx-request #results {
+    display: none;
+}
