@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from .base import Base, DataFrame, Response, Result
+from .base import Base, DataFrame, Result
 
 
 class Line(Base):
@@ -9,6 +9,6 @@ class Line(Base):
     title = "Line Chart"
     pattern = ['NUMBER', '*']
 
-    def render(self,result: Result, df: DataFrame) -> Response:
+    def render(self,result: Result, df: DataFrame) -> str:
         fig = px.line(df, x=result.column_names[1], y=result.column_names[0])
         return self.render_px(fig)

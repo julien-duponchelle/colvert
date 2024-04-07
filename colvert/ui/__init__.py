@@ -16,6 +16,7 @@ def setup_app():
         loader=jinja2.FileSystemLoader(
             os.path.join(os.path.dirname(__file__), "templates")
         ),
+        enable_async=True,
         context_processors=[aiohttp_jinja2.request_processor],
     )
     jinja.globals["current_page"] = current_page

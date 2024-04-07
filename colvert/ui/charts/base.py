@@ -1,14 +1,13 @@
+import aiohttp_jinja2
 import plotly.graph_objects
-from aiohttp.web import Response
+from aiohttp.web import Request
 from pandas import DataFrame
 
 from ...database import Result
 
 
 class Base:
-
-
-    def __init__(self, result: Result) -> None:
+    def __init__(self, request: Request, result: Result) -> None:
         if not hasattr(self, "pattern"):
             self.pattern = ['NUMBER', 'STRING', '*'] 
             raise NotImplementedError("pattern is required")
@@ -22,6 +21,7 @@ class Base:
             self.limit = 10
             raise NotImplementedError("limit is required")
         self._result = result
+        self._request = request
 
     def _validate(self):
         """
@@ -29,12 +29,14 @@ class Base:
 
         Raise ValueError if the result is not valid.
         """
-        if len(self._result.column_names) != 2:
+        if len(self._result.column_names) != 2 and self.pattern[-1:] != ["..."]:
             raise ValueError(f"{self.title} need exactly {len(self.pattern)} columns.\nExample: {self.example}")
     
         for i, pattern in enumerate(self.pattern):
             if pattern == "*":
                 continue
+            elif pattern == "...":
+                break
             elif self._result.column_types[i] != pattern:
                 raise ValueError(f"{self.title} need a {pattern} column as column {i+1} got {self._result.column_types[i]}.\nExample: {self.example}")
         
@@ -43,15 +45,19 @@ class Base:
             raise ValueError(f"{self.title} need max {self.limit} rows.")
         return True
 
-    def build(self) -> Response:
+    async def build(self) -> str:
         self._validate()
-        return self.render(self._result, self._df)
+        return await self.render(self._result, self._df)
 
-    def render(self, result: Result, df: DataFrame) -> Response:
+    async def render(self, result: Result, df: DataFrame) -> str:
         raise NotImplementedError
+    
+    async def render_template(self, template: str, context: dict) -> str:
+        return await aiohttp_jinja2.render_string_async(
+            template,
+            self._request,
+            context)
 
-    def render_px(self, fig: plotly.graph_objs.Figure) -> Response:
-        html = fig.to_html(full_html=False, include_plotlyjs=False)
-        return Response(text=html, content_type="text/html")
-
+    async def render_px(self, fig: plotly.graph_objs.Figure) -> str:
+        return '<div class="card"><div class="card-body">' + fig.to_html(full_html=False, include_plotlyjs=False) + '</div></div>'
         

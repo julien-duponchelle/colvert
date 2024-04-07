@@ -1,4 +1,5 @@
 import pytest
+from aiohttp.web import Request
 
 from ...database import Database
 from ...ui.charts import Line, Pie
@@ -11,26 +12,28 @@ class TestCharts:
         db.load_file("./samples/test.csv")
         return db
     
-    def test_validate_pie(self, db):
-        Pie(db.sql("SELECT COUNT(*),'First Name' FROM test GROUP BY ALL")).build()
+    def request(self) -> Request:
+        return Request()
+    
+    @pytest.mark.asyncio
+    async def test_validate_pie(self, request, db):
+        await Pie(request, db.sql("SELECT COUNT(*),'First Name' FROM test GROUP BY ALL")).build()
         with pytest.raises(ValueError, match="2 columns"):
-            Pie(db.sql("SELECT COUNT(*) FROM test")).build()
+            await Pie(request, db.sql("SELECT COUNT(*) FROM test")).build()
         with pytest.raises(ValueError, match="NUMBER"):
-            Pie(db.sql("SELECT 'First Name','Last Name' FROM test")).build()
+            await Pie(request, db.sql("SELECT 'First Name','Last Name' FROM test")).build()
         with pytest.raises(ValueError, match="need max 10 rows"):
-            Pie(db.sql("SELECT 1,'First Name' FROM test")).build()
+            await Pie(request, db.sql("SELECT 1,'First Name' FROM test")).build()
 
 
-    def test_render_pie(self, db):
+    @pytest.mark.asyncio
+    async def test_render_pie(self, request, db):
         result = db.sql("SELECT COUNT(*),'First Name' FROM test")
-        response = Pie(result).build()
-        assert response.status == 200
-        assert response.text
-        assert 'plotly-graph-div' in response.text
+        response = await Pie(request, result).build()
+        assert 'plotly-graph-div' in response
 
-    def test_render_line(self, db):
+    @pytest.mark.asyncio
+    async def test_render_line(self, request, db):
         result = db.sql("SELECT COUNT(*),'First Name' FROM test")
-        response = Line(result).build()
-        assert response.status == 200
-        assert response.text
-        assert 'plotly-graph-div' in response.text
+        response = await Line(request, result).build()
+        assert 'plotly-graph-div' in response

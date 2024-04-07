@@ -83,11 +83,6 @@
     });
 </script>
 
-<div class="col-s-12 col-lg-9">
-    <div class="card">
-        <div id="search" style="height: 150px; overflow: auto; resize: vertical; card-body"></div>
-    </div>
-</div>
 
 <div class="col-s-12 col-lg-3">
     <div id="form" class="card">
@@ -103,22 +98,31 @@
                 <option value="pie">Pie Chart</option>
                 <option value="line">Line Chart</option>
             </select>
+            <label for="side-by-side" class="form-label">Side by side</label>
+            <input
+                type="checkbox"
+                name="side-by-side"
+                class="form-check"
+                onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))"
+            />
         </div>
     </div>
 </div>
 
-<div class="col-12">
+<div class="col-s-12 col-lg-9">
     <div class="card">
-        <div
-            id="results"
-            class="card-body"    
-            hx-post="/results"
-            hx-trigger="load, sql-change delay:500ms"
-            hx-swap="innerHtml"
-            hx-include="#form input, #form select"
-        >
-        </div>
+        <div id="search" style="height: 150px; overflow: auto; resize: vertical; card-body"></div>
     </div>
+</div>
+
+<div
+    id="results"
+    class="col-12"
+    hx-post="/results"
+    hx-trigger="load, sql-change delay:500ms"
+    hx-swap="innerHtml"
+    hx-include="#form input, #form select"
+>
 </div>
 
 {% endblock %}

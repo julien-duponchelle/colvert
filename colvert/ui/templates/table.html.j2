@@ -1,21 +1,27 @@
-<div class="hr-text">{{ rows | length }} rows</div>
-<div class="table-responsive">
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="sticky-top">
-            <tr>
-                {% for column in columns %}
-                    <th scope="col">{{ column }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-                <tr>
-                    {% for column in row %}
-                        <td>{{ column }}</td>
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-bordered">
+                <thead class="sticky-top">
+                    <tr>
+                        {% for column in columns %}
+                            <th scope="col">{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for column in row %}
+                                <td>{{ column }}</td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">{{ length }} rows returned</small>
+    </div>
 </div>

@@ -1,7 +1,7 @@
 import pandas
 import plotly.express as px
 
-from .base import Base, Response, Result
+from .base import Base, Result
 
 
 class Pie(Base):
@@ -10,6 +10,6 @@ class Pie(Base):
     title = "Pie Chart"
     pattern = ['NUMBER', '*']
 
-    def render(self,result: Result, df: pandas.DataFrame) -> Response:
+    def render(self,result: Result, df: pandas.DataFrame) -> str:
         fig = px.pie(df, values=result.column_names[0], names=result.column_names[1])
         return self.render_px(fig)
