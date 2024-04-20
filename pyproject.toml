@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "colvert"
 dynamic = ["version", "dependencies"]
-description = 'A frontend to DuckDB'
+description = "colvert is a Frontend for DuckDB a fast and lightweight in-memory database designed for analytical queries. It's design to be a simple and easy to use tool for data analysis and visualization."
 readme = "README.md"
 requires-python = ">=3.8"
 license = "Apache-2.0"
@@ -14,7 +14,7 @@ authors = [
   { name = "Julien Duponchelle", email = "julien@duponchelle.info" },
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 2 - Pre-Alpha",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
