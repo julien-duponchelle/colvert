@@ -10,6 +10,6 @@ class Pie(Base):
     title = "Pie Chart"
     pattern = ['NUMBER', '*']
 
-    def render(self,result: Result, df: pandas.DataFrame) -> str:
+    async def render(self,result: Result, df: pandas.DataFrame) -> str:
         fig = px.pie(df, values=result.column_names[0], names=result.column_names[1])
-        return self.render_px(fig)
+        return await self.render_px(fig)

@@ -9,6 +9,6 @@ class Line(Base):
     title = "Line Chart"
     pattern = ['NUMBER', '*']
 
-    def render(self,result: Result, df: DataFrame) -> str:
+    async def render(self,result: Result, df: DataFrame) -> str:
         fig = px.line(df, x=result.column_names[1], y=result.column_names[0])
-        return self.render_px(fig)
+        return await self.render_px(fig)
