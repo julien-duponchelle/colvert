@@ -1,13 +1,36 @@
 import os.path
+import re
 
 import aiohttp_jinja2
 import markdown
 from aiohttp import web
+from markdown.extensions.admonition import AdmonitionExtension, AdmonitionProcessor
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.toc import TocExtension
 
 routes = web.RouteTableDef()
+
+
+class ColvertAdmonitionProcessor(AdmonitionProcessor):
+    """
+    Override the AdmonitionProcessor to use bootstrap classes.
+
+    Example:
+    !!! note
+        This is a note.
+    """
+    def get_class_and_title(self, match: re.Match[str]) -> tuple[str, str | None]:
+        klass = match.group(1).lower()
+        # We don't want to use the title as it's already visible via the color coded box.
+        return f"alert alert-{klass}", None
+
+
+class ColvertAdmonitionExtension(AdmonitionExtension):
+    def extendMarkdown(self, md):
+        """ Add Admonition to Markdown instance. """
+        md.registerExtension(self)
+        md.parser.blockprocessors.register(ColvertAdmonitionProcessor(md.parser), 'admonition', 105)
 
 
 def path(file: str) -> str:
@@ -20,6 +43,7 @@ def render(file: str) -> str:
             TocExtension(),
             FencedCodeExtension(),
             CodeHiliteExtension(),
+            ColvertAdmonitionExtension()
         ])
 
 @routes.get("/docs")
