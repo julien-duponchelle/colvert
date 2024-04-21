@@ -10,6 +10,7 @@
   <link rel="icon" type="image/png" href="/static/favicon.png">
   <script src="/static/htmx.min.js"></script>
   <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
+  {% block head %}{% endblock %}
   <title>Colvert</title>
 </head>
 
@@ -21,6 +22,9 @@
       </a>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
+          <a class="nav-link" href="/docs">Documentation</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="/tables">Tables</a>
         </li>
       </ul>
@@ -29,7 +33,7 @@
   <main>
     <div class="page-wrapper">
       <div class="page-body">
-        <div class="container-fluid">
+        <div class="{% block container %}{% endblock %}">
           <div class="row row-deck row-cards">
             {% block body %}
             {% endblock %}
