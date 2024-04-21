@@ -1,7 +1,8 @@
 
 import plotly.express as px
 
-from .base import Base, DataFrame, OptionTypeString, Result
+from .base import Base, DataFrame, Result
+from .types import OptionTypeString
 
 
 class Line(Base):

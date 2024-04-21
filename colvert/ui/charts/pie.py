@@ -2,7 +2,8 @@
 import pandas
 import plotly.express as px
 
-from .base import Base, OptionTypeFloat, OptionTypeString, Result
+from .base import Base, Result
+from .types import OptionTypeFloat, OptionTypeString
 
 
 class Pie(Base):
