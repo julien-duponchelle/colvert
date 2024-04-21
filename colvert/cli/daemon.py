@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import webbrowser
 from typing import List
@@ -15,9 +16,40 @@ def create_app() -> aiohttp.web.Application:
     app = setup_app()
     return app
 
-async def open_browser(app: aiohttp.web.Application):
-    webbrowser.open_new_tab(f"http://{app['host']}:{app['port']}")
 
+async def open_browser_schedule(app: aiohttp.web.Application):
+    """
+    This is run in the context of the aiohttp event loop. 
+
+    We need to create a task to open the browser and add it to the background tasks.
+    We can directly call webbrowser.open_new_tab(url) because the server is not yet started.
+    and wait for this task to finish before starting the server.
+    """
+    browser_task = asyncio.create_task(open_browser(app))
+    app["background_tasks"].add(browser_task)
+    browser_task.add_done_callback(app["background_tasks"].discard)
+
+
+async def open_browser(app: aiohttp.web.Application):
+    await asyncio.sleep(0.3) # Limit chance a race condition where the server is not yet started
+    
+    # Call the url with aiohttp.web
+    url = f"http://{app['host']}:{app['port']}"
+    async with aiohttp.ClientSession() as session:
+        tries = 0 
+        while True:
+            try:
+                async with session.get(url) as response:
+                    logging.info(f"Opening browser at {url}")
+                    webbrowser.open_new_tab(url)
+                    break
+            except aiohttp.ClientConnectorError as e:
+                print(e)
+                tries += 1
+                if tries > 3:
+                    logging.error(f"Could not connect to {url}")
+                    break
+                await asyncio.sleep(1)
 
 @click.command()
 @click.option(
@@ -46,9 +78,10 @@ def open(port: int, host: str, files: List[click.File], no_browser: bool, table:
     app["db"].load_files([file.name for file in files], table=table)
     app["host"] = host
     app["port"] = port
+    app["background_tasks"] = set()
     logging.info(f"UI listening on http://{host}:{port}")
     if not no_browser:
-        app.on_startup.append(open_browser)
+        app.on_startup.append(open_browser_schedule)
     aiohttp.web.run_app(
         app, host=host, port=port, print=None, access_log=None
     )
