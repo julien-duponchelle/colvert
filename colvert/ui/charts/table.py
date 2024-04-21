@@ -1,3 +1,4 @@
+
 import pandas
 
 from .base import Base, Result
@@ -8,6 +9,8 @@ class Table(Base):
     example = "SELECT * FROM table"
     title = "Table"
     pattern = ['...']
+    options = {
+    }
 
     def _row_iterator(self, df):
         for _, row in df.iterrows():
