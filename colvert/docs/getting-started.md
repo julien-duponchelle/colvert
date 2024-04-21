@@ -14,3 +14,9 @@ This will open the data in a memory table that you can query using SQL. Your bro
 
 !!! warning
     At this point the data is only stored in memory. If close you Colvert, you will lose the data.
+
+The table name will be the same as the file name without the extension. You can also specify a table name using the `--table` option.
+
+```console
+$ colvert open --table my_table data.csv
+```

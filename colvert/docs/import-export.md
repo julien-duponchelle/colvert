@@ -19,7 +19,6 @@ colvert open my-dataset.parquet
 ```
 
 Multiple Parquet files can be imported using the SQL interface:
-```sql
-CREATE TABLE test AS SELECT * FROM read_parquet(['file1.parquet', 'file2.parquet', 'file3.parquet']);
+```bash
+colvert open --table=dataset my-dataset-1.parquet  my-dataset-2.parquet
 ```
-

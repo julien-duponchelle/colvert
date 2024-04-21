@@ -1,5 +1,6 @@
 import logging
 import webbrowser
+from typing import List
 
 import aiohttp.web
 import click
@@ -30,14 +31,19 @@ async def open_browser(app: aiohttp.web.Application):
     is_flag=True,
     help="Do not open the browser",
 )
-@click.argument("file", type=click.File("rb"))
-def open(port: int, host: str, file: click.File, no_browser: bool):
+@click.option(
+    "--table",
+    type=str,
+   help="Table to load the file into",
+)
+@click.argument("files", type=click.File("rb"), nargs=-1)
+def open(port: int, host: str, files: List[click.File], no_browser: bool, table: str):
     """
     Load a file and start the UI
     """
     app = create_app()
     app["db"] = Database()
-    app["db"].load_files([file.name])
+    app["db"].load_files([file.name for file in files], table=table)
     app["host"] = host
     app["port"] = port
     logging.info(f"UI listening on http://{host}:{port}")

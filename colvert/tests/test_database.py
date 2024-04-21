@@ -16,6 +16,12 @@ class TestDatabase:
         assert db is not None
         assert db.tables() == ["test"]
 
+    def test_load_file_csv_set_table_name(self):
+        db = Database()
+        db.load_files(["./samples/test.csv"], table="world")
+        assert db is not None
+        assert db.tables() == ["world"]
+
     def test_load_file_csv_starting_with_digit(self, tmpdir):
         with open(tmpdir / "1.csv", "w") as f:
             f.write("a,b,c\n1,2,3\n")

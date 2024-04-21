@@ -1,7 +1,7 @@
 import logging
 import os
 import re
-from typing import List
+from typing import List, Optional
 
 import duckdb
 import pandas
@@ -49,20 +49,23 @@ class Database:
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
 
-    def load_files(self, files: List[str]) -> None:
+    def load_files(self, files: List[str], table: Optional[str] = None) -> None:
         # TODO: Add support for other file types
-        file = files[0]
-        filename = os.path.basename(file)
-        table_name = os.path.splitext(filename)[0]
-        table_name = self._escape(table_name)
-        if table_name[0].isdigit(): # Table names cannot start with a digit
-            table_name = f"table_{table_name}"
-        if file.endswith(".csv"):    
-            self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_csv_auto(?)", [file])
-        elif file.endswith(".parquet"):
-            self.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_parquet(?)", [file])
+        if table is None:
+            table = self._get_table_name(files[0])
+        table = self._escape(table)
+        if files[0].endswith(".csv"):    
+            self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
+        elif files[0].endswith(".parquet"):
+            self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
         else:
-            raise ValueError(f"Unknown file type: {file}")
+            raise ValueError(f"Unknown file type: {', '.join(files)}")
+
+    def _get_table_name(self, file):
+        filename = os.path.basename(file)
+        table = os.path.splitext(filename)[0]
+        if table[0].isdigit(): # Table names cannot start with a digit
+            table = f"table_{table}"
 
     def _escape(self, value: str) -> str:
         """
