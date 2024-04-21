@@ -7,12 +7,12 @@ class TestDatabase:
     @pytest.fixture(scope="class")
     def db(self):
         db = Database()
-        db.load_file("./samples/test.csv")
+        db.load_files(["./samples/test.csv"])
         return db
 
     def test_load_file_csv(self):
         db = Database()
-        db.load_file("./samples/test.csv")
+        db.load_files(["./samples/test.csv"])
         assert db is not None
         assert db.tables() == ["test"]
 
@@ -20,13 +20,13 @@ class TestDatabase:
         with open(tmpdir / "1.csv", "w") as f:
             f.write("a,b,c\n1,2,3\n")
         db = Database()
-        db.load_file(str(tmpdir / "1.csv"))
+        db.load_files([str(tmpdir / "1.csv")])
         assert db is not None
         assert db.tables() == ["table_1"]
 
     def test_load_file_parquet(self):
         db = Database()
-        db.load_file("./samples/test.parquet")
+        db.load_files(["./samples/test.parquet"])
         assert db is not None
         assert db.tables() == ["test"]
 

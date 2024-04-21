@@ -9,7 +9,7 @@ class TestCharts:
     @pytest.fixture(scope="class")
     def db(self):
         db = Database()
-        db.load_file("./samples/test.csv")
+        db.load_files(["./samples/test.csv"])
         return db
     
     def request(self) -> Request:

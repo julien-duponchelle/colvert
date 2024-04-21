@@ -37,7 +37,7 @@ def open(port: int, host: str, file: click.File, no_browser: bool):
     """
     app = create_app()
     app["db"] = Database()
-    app["db"].load_file(file.name)
+    app["db"].load_files([file.name])
     app["host"] = host
     app["port"] = port
     logging.info(f"UI listening on http://{host}:{port}")

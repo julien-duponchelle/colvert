@@ -16,5 +16,5 @@ def create_app() -> aiohttp.web.Application:
     logging.info("Starting colvert development server")
     app = setup_app()
     app["db"] = Database()
-    app["db"].load_file("samples/test.csv")
+    app["db"].load_files(["samples/test.csv"])
     return app

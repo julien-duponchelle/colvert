@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from typing import List
 
 import duckdb
 import pandas
@@ -48,8 +49,9 @@ class Database:
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
 
-    def load_file(self, file: str) -> None:
+    def load_files(self, files: List[str]) -> None:
         # TODO: Add support for other file types
+        file = files[0]
         filename = os.path.basename(file)
         table_name = os.path.splitext(filename)[0]
         table_name = self._escape(table_name)
