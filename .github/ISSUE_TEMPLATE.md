@@ -1,4 +1,4 @@
-* Pont version:
+* Colvert version:
 * Python version:
 * Operating System:
 
