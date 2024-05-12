@@ -40,8 +40,7 @@
         editor.onDidChangeModelContent(function () {
             const input = document.querySelector('input[name=q]');
             input.value = editor.getValue();
-            const results = document.getElementById('results');
-            results.dispatchEvent(new Event('sql-change'));
+            runQueryIfAutoRun();
         });
 
         monaco.languages.registerCompletionItemProvider("sql", {
@@ -81,6 +80,26 @@
             }
         });
     });
+
+    function runQuery() {
+        const results = document.getElementById('results');
+        results.dispatchEvent(new Event('sql-change'));
+    }
+
+    function runQueryIfAutoRun() {
+        if (document.querySelector('input[name=auto-run]').checked) {
+            runQuery();
+        }
+    }
+
+    function hideRunButtonIfAutoRun() {
+        if (document.querySelector('input[name=auto-run]').checked) {
+            document.querySelector('input[type=submit]').style.display = 'none';
+        } else {
+            document.querySelector('input[type=submit]').style.display = 'block';
+        }
+    }
+    window.onload = hideRunButtonIfAutoRun;
 </script>
 
 
@@ -93,18 +112,32 @@
         >
         <div class="card-body">
             <label for="chart" class="form-label">Chart type</label>
-            <select name="chart" class="form-select" onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))">
+            <select name="chart" class="form-select" onchange="runQueryIfAutoRun()">
                 <option value="table">Table</option>
                 <option value="pie">Pie Chart</option>
                 <option value="line">Line Chart</option>
             </select>
-            <label for="side-by-side" class="form-label">Side by side</label>
-            <input
-                type="checkbox"
-                name="side-by-side"
-                class="form-check"
-                onchange="document.getElementById('results').dispatchEvent(new Event('sql-change'))"
-            />
+            <div class="form-check form-switch">
+                <input
+                    type="checkbox"
+                    name="side-by-side"
+                    class="form-check-input"
+                    onchange="runQueryIfAutoRun()"
+                />
+                <label for="side-by-side" class="form-check-label">Side by side</label>
+            </div>
+            <div class="form-check form-switch">
+                <input
+                    type="checkbox"
+                    name="auto-run"
+                    class="form-check-input"
+                    role="switch"
+                    checked
+                    onchange="hideRunButtonIfAutoRun()"
+                />
+                <label for="auto-run" class="form-check-label">Auto run query</label>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Run query" onclick="runQuery()">
         </div>
     </div>
 </div>
