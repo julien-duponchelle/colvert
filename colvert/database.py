@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import re
@@ -40,6 +41,8 @@ class Result:
         return Result(self.result.limit(limit))
     
     def df(self) -> pandas.DataFrame:
+        if self.result is None:
+            return pandas.DataFrame()
         return self.result.df()
 
 
@@ -49,15 +52,15 @@ class Database:
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
 
-    def load_files(self, files: List[str], table: Optional[str] = None) -> None:
+    async def load_files(self, files: List[str], table: Optional[str] = None) -> None:
         # TODO: Add support for other file types
         if table is None:
             table = self._get_table_name(files[0])
         table = self._escape(table)
         if files[0].endswith(".csv"):    
-            self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
+            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
         elif files[0].endswith(".parquet"):
-            self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
+            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
         else:
             raise ValueError(f"Unknown file type: {', '.join(files)}")
 
@@ -66,6 +69,7 @@ class Database:
         table = os.path.splitext(filename)[0]
         if table[0].isdigit(): # Table names cannot start with a digit
             table = f"table_{table}"
+        return table
 
     def _escape(self, value: str) -> str:
         """
@@ -75,9 +79,9 @@ class Database:
         """
         return re.sub(r"[^a-zA-Z0-9_]", "_", value)
 
-    def describe(self, table: str):
+    async def describe(self, table: str):
         table = self._escape(table)
-        result =  self.sql(f"DESCRIBE {table}")
+        result = await self.sql(f"DESCRIBE {table}")
         rows = []
         for row in result.fetchall():
             field = {}
@@ -86,36 +90,37 @@ class Database:
             rows.append(field)
         return rows
 
-    def tables(self):
-        tables = self._db.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name ASC")
+    async def tables(self) -> list[str]:
+        tables = await self.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name ASC")
         tables = tables.fetchall()
         return [table[0] for table in tables]
 
-    def execute(self, sql: str, params: list):
-        logging.info(sql)
+    async def execute(self, sql: str, params: list, log: bool = True):
+        if log:
+            logging.info(sql)
         try:
-            result = self._db.execute(sql, params)
+            result = await asyncio.get_event_loop().run_in_executor(None, self._db.execute, sql, params)
         except duckdb.ProgrammingError as e:
             raise ParseError(e)
         return Result(result)
 
-    def sql(self, sql: str):
+    async def sql(self, sql: str):
         logging.info(sql)
         try:
-            result = self._db.sql(sql)
+            result = await asyncio.get_event_loop().run_in_executor(None, self._db.sql, sql)
         except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException) as e:
             raise ParseError(e)
         return Result(result)
     
-    def complete(self, query: str) -> list[tuple[str, str]]:
-        result = self._db.execute("SELECT * FROM sql_auto_complete(?)", [query])
+    async def complete(self, query: str) -> list[tuple[str, str]]:
+        result = await self.execute("SELECT * FROM sql_auto_complete(?)", [query], log=False)
         completions = []
         for row in result.fetchall():
             kind = "Text"
             val = row[0]
             if re.match("^[A-Z ]+$", val):
                 kind = "Keyword"
-            elif val in self.tables():
+            elif val in await self.tables():
                 kind = "Class"
             elif val[-1:] == "/":
                 kind = "File"

@@ -7,7 +7,7 @@ async def completion(request):
     body = await request.json()
     query = body.get("q", "")
 
-    completions = request.app["db"].complete(query)
+    completions = await request.app["db"].complete(query)
 
     result = []
     for kind, completion in completions:

@@ -50,7 +50,6 @@ class Base:
                 break
             elif self._result.column_types[i] != pattern:
                 raise ValueError(f"{self.title} need a {pattern} column as column {i+1} got {self._result.column_types[i]}.\nExample: {self.example}")
-        
         self._df = self._result.limit(self.limit + 1).df()
         if len(self._df) > self.limit:
             raise ValueError(f"{self.title} need max {self.limit} rows.")

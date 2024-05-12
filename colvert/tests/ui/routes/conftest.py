@@ -6,9 +6,9 @@ from colvert.ui import setup_app
 
 
 @pytest_asyncio.fixture(scope="session")
-def sample_db() -> Database:
+async def sample_db() -> Database:
     db = Database()
-    db.load_files(["./samples/test.csv"])
+    await db.load_files(["./samples/test.csv"])
     return db
 
 

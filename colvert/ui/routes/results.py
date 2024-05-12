@@ -24,7 +24,7 @@ async def index(request: web.Request) -> web.Response:
     chart_type = post.get("chart", "table")
     side_by_side = post.get("side-by-side", False)
     try:
-        result = request.app["db"].sql(query)
+        result = await request.app["db"].sql(query)
     except ParseError as e:
         logging.error(e)
         return await aiohttp_jinja2.render_template_async('error.html.j2', request, {
