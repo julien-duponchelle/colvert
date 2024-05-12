@@ -59,6 +59,8 @@ class Database:
         table = self._escape(table)
         if files[0].endswith(".csv"):    
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
+        elif files[0].endswith(".json"):    
+            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_json_auto(?)", [files])
         elif files[0].endswith(".parquet"):
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
         else:

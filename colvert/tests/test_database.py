@@ -38,6 +38,18 @@ class TestDatabase:
         assert await db.tables() == ["test"]
 
     @pytest.mark.asyncio
+    async def test_load_file_json(self):
+        db = Database()
+        await db.load_files(["./samples/test.json"])
+        assert await db.tables() == ["test"]
+
+    @pytest.mark.asyncio
+    async def test_load_file_json_unstructured(self):
+        db = Database()
+        await db.load_files(["./samples/unstructured.json"])
+        assert await db.tables() == ["test"]
+
+    @pytest.mark.asyncio
     async def test_tables(self, db: Database):
         assert await db.tables() == ["test"]
 
