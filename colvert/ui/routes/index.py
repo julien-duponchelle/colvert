@@ -27,7 +27,7 @@ async def tables(request):
     for table in await request.app["db"].tables():
         tables.append({
             "name": table,
-            "columns": request.app["db"].describe(table),
+            "columns": await request.app["db"].describe(table),
         })
     return {
         "tables": tables,

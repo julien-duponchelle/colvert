@@ -39,7 +39,7 @@ async def open_browser(app: aiohttp.web.Application):
         tries = 0 
         while True:
             try:
-                async with session.get(url) as response:
+                async with session.get(url):
                     logging.info(f"Opening browser at {url}")
                     webbrowser.open_new_tab(url)
                     break
@@ -75,11 +75,12 @@ def open(port: int, host: str, files: List[click.File], no_browser: bool, table:
     """
     app = create_app()
     app["db"] = Database()
-    app["db"].load_files([file.name for file in files], table=table)
+    logging.info(f"Loading files {', '.join(file.name for file in files)}")
     app["host"] = host
     app["port"] = port
     app["background_tasks"] = set()
     logging.info(f"UI listening on http://{host}:{port}")
+    app.on_startup.append(lambda app: app["db"].load_files([file.name for file in files], table=table))
     if not no_browser:
         app.on_startup.append(open_browser_schedule)
     aiohttp.web.run_app(

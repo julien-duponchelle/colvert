@@ -2,6 +2,7 @@
 # This file is use to run the project in demo/develoment mode.
 # 
 
+import asyncio
 import logging
 
 import aiohttp.web
@@ -16,5 +17,7 @@ def create_app() -> aiohttp.web.Application:
     logging.info("Starting colvert development server")
     app = setup_app()
     app["db"] = Database()
-    app["db"].load_files(["samples/test.csv"])
+    logging.info("Loading sample data")
+    loop = asyncio.get_running_loop()
+    loop.create_task(app["db"].load_files(["samples/test.csv"]))
     return app
