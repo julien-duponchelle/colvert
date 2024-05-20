@@ -55,7 +55,7 @@ async def open_browser(app: aiohttp.web.Application):
                 await asyncio.sleep(1)
 
 
-@click.command()
+@click.group(invoke_without_command=True)
 @click.option(
     "--port", default=9999, type=int, help="Port to listen on", show_default=True
 )
@@ -72,13 +72,14 @@ async def open_browser(app: aiohttp.web.Application):
     type=str,
     help="Table to load the file into",
 )
+@click.option("--database", type=str, help="Database file to use, by default it's in-memory", default=":memory:")
 @click.argument("files", type=click.File("rb"), nargs=-1)
-def open(port: int, host: str, files: List[click.File], no_browser: bool, table: str):
+def open(port: int, host: str, files: List[click.File], no_browser: bool, table: str, database: str):
     """
     Load a file and start the UI
     """
     app = create_app()
-    app["db"] = Database()
+    app["db"] = Database(database)
     app["host"] = host
     app["port"] = port
     app["background_tasks"] = set()

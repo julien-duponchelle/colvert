@@ -1,8 +1,8 @@
-# Getting Started
+# Getting started
 
 Colvert is a browser based data analysis tool that allows you to import, and visualize data using SQL queries. This guide will walk you through the basics of using Colvert.
 
-## Importing Data
+## Importing data
 
 To get started, you will need to import some data. You can import data from a CSV file, JSON file or a parquet file.
 
@@ -19,4 +19,12 @@ The table name will be the same as the file name without the extension. You can 
 
 ```console
 $ colvert open --table my_table data.csv
+```
+
+## Pesist on disk
+
+To persist the data on disk, you can use the `--database` option.
+
+```console
+$ colvert open --database=my-dataset.duckdb data.csv
 ```

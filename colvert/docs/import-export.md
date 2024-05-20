@@ -6,6 +6,22 @@ Colvert supports importing and exporting data in various formats. This page prov
 
 Colvert will automatically detect the format of the file based on the file extension.
 
+## DuckDB
+
+DuckDB file can be imported using the command line interface:
+
+```bash
+colvert open my-dataset.duckdb
+```
+
+Or 
+
+```bash
+colvert open --database=my-dataset.duckdb
+```
+
+The file extension `.db` is also supported.
+
 ## CSV
 
 CSV (Comma Separated Values) is a simple text format for tabular data. Colvert supports importing data in CSV format.

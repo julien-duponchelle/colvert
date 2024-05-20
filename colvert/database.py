@@ -47,12 +47,14 @@ class Result:
 
 
 class Database:
-    def __init__(self) -> None:
-        self._db = duckdb.connect(":memory:")
+    def __init__(self, database=":memory:") -> None:
+        self._db = duckdb.connect(database)
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
 
     async def load_files(self, files: List[str], table: Optional[str] = None) -> None:
+        if len(files) == 0:
+            return
         # TODO: Add support for other file types
         if table is None:
             table = self._get_table_name(files[0])
@@ -63,6 +65,8 @@ class Database:
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_json_auto(?)", [files])
         elif files[0].endswith(".parquet"):
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
+        elif files[0].endswith(".db") or files[0].endswith(".duckdb"):
+            self._db = duckdb.connect(files[0])
         else:
             raise ValueError(f"Unknown file type: {', '.join(files)}")
 

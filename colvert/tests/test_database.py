@@ -44,6 +44,12 @@ class TestDatabase:
         assert await db.tables() == ["test"]
 
     @pytest.mark.asyncio
+    async def test_load_file_duckdb(self):
+        db = Database()
+        await db.load_files(["./samples/test.db"])
+        assert await db.tables() == ["test"]
+
+    @pytest.mark.asyncio
     async def test_load_file_json_unstructured(self):
         db = Database()
         await db.load_files(["./samples/unstructured.json"])
