@@ -25,8 +25,8 @@ It's a web frontend running on top of DuckDB. It's support SQL queries and visua
 
 It's support loading data from CSV, Parquet, and JSON files.
 
-![Table screenshot](docs/charts/table/table.png)
-![Pie chart screenshot](docs/charts/pie/pie.png)
+![Table screenshot](colvert/docs/charts/table/table.png)
+![Pie chart screenshot](colvert/docs/charts/pie/pie.png)
 
 ## Installation
 
