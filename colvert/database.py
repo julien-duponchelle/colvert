@@ -59,7 +59,7 @@ class Database:
         if table is None:
             table = self._get_table_name(files)
         table = self._escape(table)
-        if files[0].endswith(".csv"):    
+        if files[0].endswith(".csv") or files[0].endswith(".tsv"):
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
         elif files[0].endswith(".json"):    
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_json_auto(?)", [files])
