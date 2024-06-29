@@ -91,3 +91,11 @@ class TestDatabase:
         res = await db.describe("test")
         assert len(res) == 5
         assert res[0]['column_name'] == "Id"
+
+    @pytest.mark.asyncio
+    async def test_get_table_name(self, db):
+        assert db._get_table_name(["test.csv"]) == "test"
+        assert db._get_table_name(["1test.csv"]) == "table_1test"
+        assert db._get_table_name(["test_2024.csv", "test_2023.csv"]) == "test"
+        assert db._get_table_name(["test_2024_01.csv", "test_2024_02.csv"]) == "test_2024"
+        assert db._get_table_name(["test-2024-01.csv", "test-2024-02.csv"]) == "test_2024"

@@ -57,7 +57,7 @@ class Database:
             return
         # TODO: Add support for other file types
         if table is None:
-            table = self._get_table_name(files[0])
+            table = self._get_table_name(files)
         table = self._escape(table)
         if files[0].endswith(".csv"):    
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
@@ -70,9 +70,28 @@ class Database:
         else:
             raise ValueError(f"Unknown file type: {', '.join(files)}")
 
-    def _get_table_name(self, file):
-        filename = os.path.basename(file)
-        table = os.path.splitext(filename)[0]
+    def _get_table_name(self, files: List[str]):
+        """
+        Compute a table name from a list of files
+        """
+
+        filenames = [os.path.basename(file) for file in files]
+        tables = [os.path.splitext(filename)[0].replace("-", "_") for filename in filenames]
+
+        # We want to find the common prefix of the tables
+        # using the underscore as a separator
+        # Example 2024-01, 2024-02, 2024-03 -> 2024
+        parts = [table.split("_") for table in tables]
+        common = []
+        for idx in range(min(len(parts), len(parts[0]))):
+            if len(set(part[idx] for part in parts)) == 1:
+                common.append(parts[0][idx])
+            else:
+                break
+        if len(common) == 0:
+            table = tables[0]
+        else:
+            table = "_".join(common)
         if table[0].isdigit(): # Table names cannot start with a digit
             table = f"table_{table}"
         return table
