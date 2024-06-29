@@ -53,7 +53,7 @@ class TestDatabase:
     async def test_load_file_json_unstructured(self):
         db = Database()
         await db.load_files(["./samples/unstructured.json"])
-        assert await db.tables() == ["test"]
+        assert await db.tables() == ["unstructured"]
 
     @pytest.mark.asyncio
     async def test_tables(self, db: Database):
@@ -99,3 +99,12 @@ class TestDatabase:
         assert db._get_table_name(["test_2024.csv", "test_2023.csv"]) == "test"
         assert db._get_table_name(["test_2024_01.csv", "test_2024_02.csv"]) == "test_2024"
         assert db._get_table_name(["test-2024-01.csv", "test-2024-02.csv"]) == "test_2024"
+        assert db._get_table_name(["test 2024 01.csv", "test 2024 02.csv"]) == "test_2024"
+        assert db._get_table_name(["test 2024.01.02.csv", "test 2024.01.03.csv"]) == "test_2024_01"
+        assert db._get_table_name(["test 2024.csv", "test 2024.01.03.csv"]) == "test_2024"
+
+    @pytest.mark.asyncio
+    async def test_group_files(self, db):
+        assert list(db._group_files(["test.csv", "world.csv"])) == [["test.csv"], ["world.csv"]]
+        assert list(db._group_files(["test-001.csv", "test-002.csv"])) == [["test-001.csv", "test-002.csv"]]
+        assert list(db._group_files(["user-group.csv", "user-invoice.csv"])) == [["user-group.csv"], ["user-invoice.csv"]]

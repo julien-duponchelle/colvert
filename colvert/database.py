@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import re
-from typing import List, Optional
+from typing import Generator, List, Optional
 
 import duckdb
 import pandas
@@ -55,9 +55,14 @@ class Database:
     async def load_files(self, files: List[str], table: Optional[str] = None) -> None:
         if len(files) == 0:
             return
-        # TODO: Add support for other file types
-        if table is None:
-            table = self._get_table_name(files)
+        if table is not None:
+            await self._load_files_to_table(files, table)
+        else:
+            for files in self._group_files(files):
+                table = self._get_table_name(files)
+                await self._load_files_to_table(files, table)
+
+    async def _load_files_to_table(self, files: List[str], table: str):
         table = self._escape(table)
         if files[0].endswith(".csv") or files[0].endswith(".tsv"):
             await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
@@ -70,20 +75,43 @@ class Database:
         else:
             raise ValueError(f"Unknown file type: {', '.join(files)}")
 
+    def _group_files(self, files: List[str]) -> Generator[List[str], None, None]:
+        """
+        Group files that belong to the same table
+
+        Example: 
+        [user-001.csv, user-002.csv, user-003.csv], [order-001.csv, order-002.csv], [product.csv]
+        """
+        current_group = []
+        file_name_pattern = re.compile(r"[\s_-][0-9]")
+        
+        for file in sorted(files):
+            if len(current_group) == 0:
+                current_group.append(file)
+            else:
+                if re.split(file_name_pattern, current_group[0])[0] == re.split(file_name_pattern, file)[0]:
+                    current_group.append(file)
+                else:
+                    yield current_group
+                    current_group = [file]
+        if len(current_group) > 0:
+            yield current_group
+
+
     def _get_table_name(self, files: List[str]):
         """
         Compute a table name from a list of files
         """
 
         filenames = [os.path.basename(file) for file in files]
-        tables = [os.path.splitext(filename)[0].replace("-", "_") for filename in filenames]
+        tables = [re.sub(r'[ -\.]', '_', os.path.splitext(filename)[0]) for filename in filenames]
 
         # We want to find the common prefix of the tables
         # using the underscore as a separator
         # Example 2024-01, 2024-02, 2024-03 -> 2024
         parts = [table.split("_") for table in tables]
         common = []
-        for idx in range(min(len(parts), len(parts[0]))):
+        for idx in range(0, len(parts[0])):
             if len(set(part[idx] for part in parts)) == 1:
                 common.append(parts[0][idx])
             else:

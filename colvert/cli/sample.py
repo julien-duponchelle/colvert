@@ -27,11 +27,13 @@ DATASETS = {
             "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-03.parquet"
         ]
     ),
-    "imbd": Dataset(
+    "imdb": Dataset(
         name="IMBD",
         website="https://www.imdb.com/interfaces/",
         urls = [
             "https://datasets.imdbws.com/title.basics.tsv.gz",
+            "https://datasets.imdbws.com/title.principals.tsv.gz",
+            "https://datasets.imdbws.com/name.basics.tsv.gz"
         ]
     ),
 }
