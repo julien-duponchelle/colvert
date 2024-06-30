@@ -2,7 +2,7 @@
 import plotly.express as px
 
 from .base import Base, DataFrame, Result
-from .types import OptionTypeString
+from .types import OptionTypeResultColumn, OptionTypeString
 
 
 class Line(Base):
@@ -12,9 +12,9 @@ class Line(Base):
     pattern = ['NUMBER', '*', '...']
     options = [
         OptionTypeString("title", "Title"),
-        OptionTypeString("color", "Color"),
-        OptionTypeString("facet_row", "Facet Row"),
-        OptionTypeString("facet_col", "Facet Column"),
+        OptionTypeResultColumn("color", "Color"),
+        OptionTypeResultColumn("facet_row", "Facet Row"),
+        OptionTypeResultColumn("facet_col", "Facet Column"),
     ]
 
     async def render(self, result: Result, df: DataFrame) -> str:

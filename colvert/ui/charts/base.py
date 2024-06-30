@@ -75,7 +75,7 @@ class Base:
         out += '<div class="col-s-12 col-lg-3" id="form-chart">'
         out += '<div class="card"><div class="card-body">'
         for opt in self.options:
-            out += opt.render(self.user_options.get(opt.name))
+            out += opt.render(self.user_options.get(opt.name), self._result.column_names)
         out += '</div></div>'
         out += '</div>'
 
