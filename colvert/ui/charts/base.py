@@ -31,7 +31,7 @@ class Base:
         self.user_options = {}
         for opt in self.options:
             val = options.get(opt.name)
-            if val is not None:
+            if val is not None and val != "":
                 self.user_options[opt.name] = opt.convert(val)
 
     def _validate(self):
