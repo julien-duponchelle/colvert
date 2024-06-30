@@ -52,7 +52,7 @@ async def index(request: web.Request) -> web.Response:
 
 async def render_side_by_side(chart_type, request, result, options)-> web.Response:
     body_table = await render_chart("table", request, result, options, col=6)
-    body_chart = await render_chart( chart_type, request, result, options, col=6)
+    body_chart = await render_chart(chart_type, request, result, options, col=6)
     return web.Response(text='<div class="row">'+ body_table + body_chart + '</div>', content_type="text/html")
 
 

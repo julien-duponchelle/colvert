@@ -1,4 +1,5 @@
 import html
+from typing import List
 
 
 class BaseOptionType:
@@ -7,7 +8,7 @@ class BaseOptionType:
         self.label = label
         self.default = default
 
-    def render(self, value):
+    def render(self, value, _result_columns: List[str]):
         return f'<label for="{self.name}" class="form-label">{self.label}</label>'
 
     def input(self, value=None, **kwargs):
@@ -33,8 +34,8 @@ class BaseOptionType:
 
 
 class OptionTypeString(BaseOptionType):
-    def render(self, value):
-        out = super().render(value)
+    def render(self, value, result_columns: List[str]):
+        out = super().render(value, result_columns)
         out += self.input(
             value=value,
             type="text",
@@ -49,8 +50,8 @@ class OptionTypeFloat(BaseOptionType):
         self.max = max
         super().__init__(name, label, **kwargs)
 
-    def render(self, value):
-        out = super().render(value)
+    def render(self, value, result_columns: List[str]):
+        out = super().render(value, result_columns)
         out += self.input(
             value=value,
             type="number",
@@ -62,3 +63,35 @@ class OptionTypeFloat(BaseOptionType):
 
     def convert(self, value):
         return float(value)
+    
+
+class OptionTypeResultColumn(BaseOptionType):
+    """
+    This option type is used to select a column from the SQL result.
+
+    Example:
+    SELECT COUNT(*) as score,name FROM table
+
+    Is going to display a select with the columns name and score.
+    """
+    def render(self, value, result_columns: List[str]) -> str:
+        out = super().render(value, result_columns)
+        
+        out += '<select autocomplete="on"'
+        out += f' id="{self.name}"'
+        out += f' name="{self.name}"'
+        out += ' class="form-control"'
+        out += ' onchange="document.getElementById(\'results\').dispatchEvent(new Event(\'sql-change\'))"'
+        out += ">"
+
+        out += '<option value=""></option>'
+        for result_column in result_columns:
+            if value == result_column:
+                selected = "selected"
+            else:
+                selected = ""
+            out += f"<option value=\"{result_column}\" {selected}>{result_column}</option>"
+
+        out += "</select>"
+
+        return out
