@@ -69,18 +69,23 @@ class Base:
             context)
 
     async def render_px(self, fig: plotly.graph_objs.Figure) -> str:
-        out = '<div class="card"><div class="card-body">'
+        out = '<div class="row">'
         
+
         out += '<div class="col-s-12 col-lg-3" id="form-chart">'
+        out += '<div class="card"><div class="card-body">'
         for opt in self.options:
             out += opt.render(self.user_options.get(opt.name))
+        out += '</div></div>'
         out += '</div>'
 
         out += '<div class="col-s-12 col-lg-9">'
+        out += '<div class="card"><div class="card-body">'
         out += fig.to_html(full_html=False, include_plotlyjs=False)
+        out += '</div></div>'
         out += '</div>'
         
-        out += '</div></div>'
+        out += '</div>'
 
         return out
         
