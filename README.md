@@ -47,7 +47,7 @@ This will detect the type of the file and open it in a new browser tab.
 
 ## Documentation
 
-Once `colvert` is installed, you can access the documentation from the web interface. You can also access the documentation in the [colvert/docs] folder.
+Once `colvert` is installed, you can access the documentation from the web interface. You can also access the documentation in the [documentation](colvert/docs/index.md) folder.
 
 ## License
 
