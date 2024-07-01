@@ -15,6 +15,20 @@ async def test_post_results(http_server_sample_db):
 
 
 @pytest.mark.asyncio
+async def test_post_results_disable_auto_run(http_server_sample_db):
+    resp = await http_server_sample_db.post(
+        "/results",
+        data={
+            "q": "INSERT INTO test VALUES ('John', 'Doe')",
+            "auto-run": True
+        }
+    )
+    assert resp.status == 200
+    assert "Query is not auto-runnable" in await resp.text()
+    assert resp.headers["HX-Trigger"] == "disableAutoRun"
+    assert resp.headers["HX-Reswap"] == "afterbegin"
+
+@pytest.mark.asyncio
 async def test_post_results_pie(http_server_sample_db):
     resp = await http_server_sample_db.post(
         "/results",

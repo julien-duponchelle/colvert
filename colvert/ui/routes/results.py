@@ -1,11 +1,11 @@
 import logging
 
-import aiohttp_jinja2
 from aiohttp import web
 from plotly.offline.offline import get_plotlyjs
 
-from ...database import ParseError
+from ...database import ParseError, Query
 from .. import charts
+from ..components import error_box, info_box, warning_box
 
 routes = web.RouteTableDef()
 
@@ -20,20 +20,24 @@ async def plotly_js(request) -> web.Response:
 @routes.post("/results")
 async def index(request: web.Request) -> web.Response:
     post = await request.post()
-    query = post.get("q", "")
-    chart_type = post.get("chart", "table")
+    query = Query(str(post.get("q", "")))
+    chart_type = str(post.get("chart", "table"))
     side_by_side = post.get("side-by-side", False)
+    auto_run = post.get("auto-run", False)
+
+    if auto_run and not query.auto_runnable():
+        response = await warning_box("Query is not auto-runnable because it's not read only. Disabling auto-run.", request)
+        response.headers["HX-Reswap"] = "afterbegin"
+        response.headers["HX-Trigger"] = "disableAutoRun"
+        return response
+
     try:
         result = await request.app["db"].sql(query)
     except ParseError as e:
         logging.error(e)
-        return await aiohttp_jinja2.render_template_async('error.html.j2', request, {
-            "message": str(e),
-        })
+        return await error_box(str(e), request)
     if result is None:
-        return await aiohttp_jinja2.render_template_async('info.html.j2', request, {
-            "message": "No results",
-        })
+        return await info_box("No results", request)
     
     options = {}
     for key, value in post.items():
@@ -46,9 +50,8 @@ async def index(request: web.Request) -> web.Response:
             return await render_full(chart_type, request, result, options)
     except ValueError as e:
         logging.error(e)
-        return await aiohttp_jinja2.render_template_async('error.html.j2', request, {
-            "message": str(e),
-        })
+        return await error_box(str(e), request)
+    
 
 async def render_side_by_side(chart_type, request, result, options)-> web.Response:
     body_table = await render_chart("table", request, result, options, col=6)

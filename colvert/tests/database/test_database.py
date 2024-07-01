@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 
-from colvert.database import Database
+from colvert.database import Database, Query
 
 
 class TestDatabase:
@@ -61,12 +61,12 @@ class TestDatabase:
 
     @pytest.mark.asyncio
     async def test_execute(self, db):
-        res = await db.execute("SELECT COUNT(*) FROM test", [])
+        res = await db._execute("SELECT COUNT(*) FROM test", [])
         assert res.fetchone()[0] == 12
 
     @pytest.mark.asyncio
     async def test_sql(self, db):
-        res = await db.execute("SELECT COUNT(*) FROM test", [])
+        res = await db.sql(Query("SELECT COUNT(*) FROM test"))
         assert res.fetchone()[0] == 12
 
     @pytest.mark.asyncio

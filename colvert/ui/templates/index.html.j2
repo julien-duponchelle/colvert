@@ -80,18 +80,20 @@
             }
         });
     });
-
     function runQuery() {
         const results = document.getElementById('results');
         results.dispatchEvent(new Event('sql-change'));
     }
-
     function runQueryIfAutoRun() {
         if (document.querySelector('input[name=auto-run]').checked) {
             runQuery();
         }
     }
-
+    // An HX-Trigger event to disable auto-run
+    document.body.addEventListener("disableAutoRun", function(evt){
+        document.querySelector('input[name=auto-run]').checked = false;
+        hideRunButtonIfAutoRun();
+    });
     function hideRunButtonIfAutoRun() {
         if (document.querySelector('input[name=auto-run]').checked) {
             document.querySelector('input[type=submit]').style.display = 'none';
