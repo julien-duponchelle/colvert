@@ -5,45 +5,10 @@ import re
 from typing import Generator, List, Optional
 
 import duckdb
-import pandas
 
-
-class ParseError(duckdb.ParserException):
-    pass
-
-
-class Result:
-    """
-    Wrapper around duckdb result
-    """
-    def __init__(self, result) -> None:
-        self.result = result
-        if result is None:
-            self.column_names = []
-            self.column_types = []
-        else:
-            self.column_names = [d[0] for d in result.description]
-            self.column_types = [d[1] for d in result.description]
-    
-    def fetchall(self):
-        if self.result is None:
-            return []
-        return self.result.fetchall()
-
-    def fetchone(self):
-        if self.result is None: 
-            return None
-        return self.result.fetchone()
-    
-    def limit(self, limit: int) -> "Result":
-        if self.result is None:
-            return self
-        return Result(self.result.limit(limit))
-    
-    def df(self) -> pandas.DataFrame:
-        if self.result is None:
-            return pandas.DataFrame()
-        return self.result.df()
+from .error import ParseError
+from .query import Query
+from .result import Result
 
 
 class Database:
@@ -65,11 +30,11 @@ class Database:
     async def _load_files_to_table(self, files: List[str], table: str):
         table = self._escape(table)
         if files[0].endswith(".csv") or files[0].endswith(".tsv"):
-            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
+            await self._execute(f"CREATE TABLE {table} AS SELECT * FROM read_csv_auto(?)", [files])
         elif files[0].endswith(".json"):    
-            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_json_auto(?)", [files])
+            await self._execute(f"CREATE TABLE {table} AS SELECT * FROM read_json_auto(?)", [files])
         elif files[0].endswith(".parquet"):
-            await self.execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
+            await self._execute(f"CREATE TABLE {table} AS SELECT * FROM read_parquet(?)", [files])
         elif files[0].endswith(".db") or files[0].endswith(".duckdb"):
             self._db = duckdb.connect(files[0])
         else:
@@ -134,7 +99,7 @@ class Database:
 
     async def describe(self, table: str):
         table = self._escape(table)
-        result = await self.sql(f"DESCRIBE {table}")
+        result = await self._execute(f"DESCRIBE {table}")
         rows = []
         for row in result.fetchall():
             field = {}
@@ -144,29 +109,41 @@ class Database:
         return rows
 
     async def tables(self) -> list[str]:
-        tables = await self.sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name ASC")
+        tables = await self._execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name ASC")
         tables = tables.fetchall()
         return [table[0] for table in tables]
 
-    async def execute(self, sql: str, params: list, log: bool = True):
+    async def _execute(self, sql: str, params: list = [], log: bool = True) -> Result:
+        """
+        Internal method to execute a query
+
+        :param sql: SQL query
+        :param params: Parameters for prepared statements
+        :param log: Log the query to the console
+
+        :return: Result object
+        """
         if log:
             logging.info(sql)
         try:
-            result = await asyncio.get_event_loop().run_in_executor(None, self._db.execute, sql, params)
+            result = await asyncio.get_event_loop().run_in_executor(None, self._db.execute, str(sql), params)
         except duckdb.ProgrammingError as e:
             raise ParseError(e)
         return Result(result)
 
-    async def sql(self, sql: str):
+    async def sql(self, sql: Query) -> Result:
+        """
+        External method to execute a query
+        """
         logging.info(sql)
         try:
-            result = await asyncio.get_event_loop().run_in_executor(None, self._db.sql, sql)
+            result = await asyncio.get_event_loop().run_in_executor(None, self._db.sql, str(sql))
         except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException) as e:
             raise ParseError(e)
         return Result(result)
     
     async def complete(self, query: str) -> list[tuple[str, str]]:
-        result = await self.execute("SELECT * FROM sql_auto_complete(?)", [query], log=False)
+        result = await self._execute("SELECT * FROM sql_auto_complete(?)", [query], log=False)
         completions = []
         for row in result.fetchall():
             kind = "Text"
