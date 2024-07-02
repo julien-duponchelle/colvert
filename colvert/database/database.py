@@ -6,7 +6,7 @@ from typing import Generator, List, Optional
 
 import duckdb
 
-from .error import ParseError
+from .error import ProgrammingError
 from .query import Query
 from .result import Result
 
@@ -131,7 +131,7 @@ class Database:
         try:
             result = await asyncio.get_event_loop().run_in_executor(None, self._db.execute, str(sql), params)
         except duckdb.ProgrammingError as e:
-            raise ParseError(e)
+            raise ProgrammingError(e)
         return Result(result)
 
     async def sql(self, sql: Query) -> Result:
@@ -141,8 +141,8 @@ class Database:
         logging.info(sql)
         try:
             result = await asyncio.get_event_loop().run_in_executor(None, self._db.sql, str(sql))
-        except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException) as e:
-            raise ParseError(e)
+        except (duckdb.ProgrammingError, duckdb.IOException, duckdb.NotImplementedException, duckdb.ConversionException) as e:
+            raise ProgrammingError(e)
         return Result(result)
     
     async def complete(self, query: str) -> list[tuple[str, str]]:

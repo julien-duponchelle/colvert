@@ -1,4 +1,7 @@
+import duckdb
 import pandas
+
+from .error import ProgrammingError
 
 
 class Result:
@@ -32,4 +35,7 @@ class Result:
     def df(self) -> pandas.DataFrame:
         if self.result is None:
             return pandas.DataFrame()
-        return self.result.df()
+        try:
+            return self.result.df()
+        except duckdb.ConversionException as e:
+            raise ProgrammingError(e)

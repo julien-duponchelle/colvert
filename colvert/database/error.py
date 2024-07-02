@@ -1,5 +1,8 @@
 import duckdb
 
 
-class ParseError(duckdb.ParserException):
+class ProgrammingError(duckdb.ParserException):
+    """
+    A user error occurred
+    """
     pass

@@ -67,3 +67,15 @@ async def test_post_results_error(http_server_sample_db):
     assert resp.status == 200
     assert "Parser Error:" in await resp.text()
     
+@pytest.mark.asyncio
+async def test_post_results_conversion_error(http_server_sample_db):
+    resp = await http_server_sample_db.post(
+        "/results",
+        data={
+            "q": 'SELECT COUNT(*) FROM test WHERE \'WRONG\'',
+            "chart": "table"
+        }
+    )
+    assert resp.status == 200
+    assert "Conversion Error" in await resp.text()
+    
