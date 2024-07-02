@@ -102,20 +102,16 @@
         }
     }
     document.addEventListener('DOMContentLoaded', hideRunButtonIfAutoRun);
+
     function toggleSideBySideCheckbox() {
         const chartType = document.querySelector('select[name="chart"]').value;
-        const sideBySideCheckbox = document.querySelector('input[name="side-by-side"]');
-        const sideBySideLabel = document.querySelector('label[for="side-by-side"]');
+        const sideBySideCheckbox = document.getElementById('side-by-side-checkbox')
         if (chartType === "table") {
-            sideBySideCheckbox.disabled = true;
-            sideBySideCheckbox.checked = false;
-            sideBySideLabel.style.display = "none";
+            sideBySideCheckbox.style.display = "none";
         } else {
-            sideBySideCheckbox.disabled = false;
-            sideBySideLabel.style.display = "block";
+            sideBySideCheckbox.style.display = "block";
         }
     }
-    document.querySelector('select[name="chart"]').addEventListener('change', toggleSideBySideCheckbox);
     document.addEventListener('DOMContentLoaded', toggleSideBySideCheckbox);
 </script>
 
@@ -129,12 +125,12 @@
         >
         <div class="card-body">
             <label for="chart" class="form-label">Chart type</label>
-            <select name="chart" class="form-select" onchange="runQueryIfAutoRun()">
+            <select name="chart" class="form-select" onchange="runQueryIfAutoRun();toggleSideBySideCheckbox()">
                 <option value="table">Table</option>
                 <option value="pie">Pie Chart</option>
                 <option value="line">Line Chart</option>
             </select>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch" id="side-by-side-checkbox">
                 <input
                     type="checkbox"
                     name="side-by-side"
