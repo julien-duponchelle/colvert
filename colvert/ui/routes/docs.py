@@ -34,7 +34,6 @@ class ColvertAdmonitionExtension(AdmonitionExtension):
 
 
 def path(file: str) -> str:
-    
     return os.path.join(os.path.dirname(__file__), "..", "..", "docs", file)
 
 def render(file: str) -> str:
@@ -51,12 +50,16 @@ def render(file: str) -> str:
 async def index(request) -> dict[str, str]:
     return {"html": render("index.md")}
 
-
 @routes.get("/docs/{file:[a-z-/]+}.png")
 async def get_png(request) -> web.Response:
     file = request.match_info["file"]
     return web.Response(body=open(path(file + ".png"), "rb").read(), content_type="image/png")
 
+@routes.get("/docs/{file:[a-z-/]+}.md")
+@aiohttp_jinja2.template("docs.html.j2")
+async def get_md(request) -> dict[str, str]:
+    file = request.match_info["file"]
+    return {"html": render(file + ".md")}
 
 @routes.get("/docs/{file:[a-z-/]+}")
 @aiohttp_jinja2.template("docs.html.j2")
