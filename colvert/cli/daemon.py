@@ -102,4 +102,15 @@ def open(port: int, host: str, files: List[click.File], no_browser: bool, table:
     app.on_startup.append(load_files)
     if not no_browser:
         app.on_startup.append(open_browser_schedule)
-    aiohttp.web.run_app(app, host=host, port=port, print=None, access_log=None)
+
+    runner = aiohttp.web.AppRunner(app)
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(runner.setup())
+        site = aiohttp.web.TCPSite(runner, host, port)
+        loop.run_until_complete(site.start())
+        loop.run_forever()
+    except OSError as e:
+        logging.error(e)
+    except KeyboardInterrupt:
+        pass
