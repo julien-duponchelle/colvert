@@ -101,7 +101,18 @@
             document.querySelector('input[type=submit]').style.display = 'block';
         }
     }
-    window.onload = hideRunButtonIfAutoRun;
+    document.addEventListener('DOMContentLoaded', hideRunButtonIfAutoRun);
+
+    function toggleSideBySideCheckbox() {
+        const chartType = document.querySelector('select[name="chart"]').value;
+        const sideBySideCheckbox = document.getElementById('side-by-side-checkbox')
+        if (chartType === "table") {
+            sideBySideCheckbox.style.display = "none";
+        } else {
+            sideBySideCheckbox.style.display = "block";
+        }
+    }
+    document.addEventListener('DOMContentLoaded', toggleSideBySideCheckbox);
 </script>
 
 <div class="row">
@@ -114,12 +125,12 @@
         >
         <div class="card-body">
             <label for="chart" class="form-label">Chart type</label>
-            <select name="chart" class="form-select" onchange="runQueryIfAutoRun()">
+            <select name="chart" class="form-select" onchange="runQueryIfAutoRun();toggleSideBySideCheckbox()">
                 <option value="table">Table</option>
                 <option value="pie">Pie Chart</option>
                 <option value="line">Line Chart</option>
             </select>
-            <div class="form-check form-switch">
+            <div class="form-check form-switch" id="side-by-side-checkbox">
                 <input
                     type="checkbox"
                     name="side-by-side"
