@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 import pytest_asyncio
 
-from colvert.database import Database, Query
+from colvert.database import Database, ProgrammingError, Query
 
 
 class TestDatabase:
@@ -77,6 +77,11 @@ class TestDatabase:
     async def test_sql(self, db):
         res = await db.sql(Query("SELECT COUNT(*) FROM test"))
         assert res.fetchone()[0] == 12
+
+    @pytest.mark.asyncio
+    async def test_sql_error(self, db):
+        with pytest.raises(ProgrammingError):
+            await db.sql(Query("SELECT * FROM blal"))
 
     @pytest.mark.asyncio
     async def test_complete(self, db):

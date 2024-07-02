@@ -3,7 +3,7 @@ import logging
 from aiohttp import web
 from plotly.offline.offline import get_plotlyjs
 
-from ...database import ParseError, Query
+from ...database import ProgrammingError, Query
 from .. import charts
 from ..components import error_box, info_box, warning_box
 
@@ -33,7 +33,7 @@ async def index(request: web.Request) -> web.Response:
 
     try:
         result = await request.app["db"].sql(query)
-    except ParseError as e:
+    except ProgrammingError as e:
         logging.error(e)
         return await error_box(str(e), request)
     if result is None:
@@ -48,7 +48,7 @@ async def index(request: web.Request) -> web.Response:
             return await render_side_by_side(chart_type, request, result, options)
         else:
             return await render_full(chart_type, request, result, options)
-    except ValueError as e:
+    except (ValueError, ProgrammingError) as e:
         logging.error(e)
         return await error_box(str(e), request)
     
