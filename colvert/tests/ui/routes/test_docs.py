@@ -9,9 +9,17 @@ async def test_index(http_server):
     content = await resp.content.read()
     assert b'Charts' in content
 
+
+@pytest.mark.asyncio
+async def test_replace_index_md(http_server):
+    resp = await http_server.get("/docs")
+    assert resp.status == 200
+    content = await resp.content.read()
+    assert b'/charts' in content
+
 @pytest.mark.asyncio
 async def test_path(http_server):
-    resp = await http_server.get("/docs/charts/pie/index")
+    resp = await http_server.get("/docs/charts/pie/index.md")
     assert resp.status == 200
     content = await resp.content.read()
     assert b'Hole' in content
