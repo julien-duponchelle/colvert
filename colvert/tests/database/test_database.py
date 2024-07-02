@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import pytest_asyncio
 
@@ -10,6 +12,13 @@ class TestDatabase:
         db = Database()
         await db.load_files(["./samples/test.csv"])
         return db
+    
+    def test_init_io_error(self, tmp_path):
+        path = Path(tmp_path / "test.db")
+        path.touch()
+        path.chmod(0o000)
+        with pytest.raises(OSError):
+            Database(str(path / "test.db"))
 
     @pytest.mark.asyncio
     async def test_load_file_csv(self):

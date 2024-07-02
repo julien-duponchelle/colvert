@@ -13,7 +13,10 @@ from .result import Result
 
 class Database:
     def __init__(self, database=":memory:") -> None:
-        self._db = duckdb.connect(database)
+        try:
+            self._db = duckdb.connect(database)
+        except duckdb.IOException as e:
+            raise OSError(e)
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
 

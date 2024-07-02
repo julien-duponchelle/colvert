@@ -79,7 +79,11 @@ def open(port: int, host: str, files: List[click.File], no_browser: bool, table:
     Load a file and start the UI
     """
     app = create_app()
-    app["db"] = Database(database)
+    try:
+        app["db"] = Database(database)
+    except OSError as e:
+        logging.error(e)
+        return
     app["host"] = host
     app["port"] = port
     app["background_tasks"] = set()
