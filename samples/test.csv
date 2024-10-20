@@ -1,13 +1,13 @@
-Id,First Name,Last Name,City,Birth Date
-1,John,Doe,New York,1980-01-01
-2,Jane,Doe,Los Angeles,1985-01-01
-3,Jim,Smith,Chicago,1990-01-01
-4,Jane,Smith,Chicago,1995-12-01
-5,John,Smith,Chicago,2000-05-03
-6,Jean,Denis,Paris,2000-05-03
-7,Jeanne,Dupont,Paris,2000-05-03
-8,Georges,Dupont,Paris,1986-12-03
-9,Henry,Dupont,Paris,1919-12-03
-10,Marie,Dupont,Paris,1920-11-15
-11,Eric,Dupont,Paris,1920-05-06
-12,Hector,Dupont,Paris,1922-04-07
+Id,First Name,Last Name,City,Birth Date,Gender,Eye Color
+1,John,Doe,New York,1980-01-01,M,Brown
+2,Jane,Doe,Los Angeles,1985-01-01,F,Blue
+3,Jim,Smith,Chicago,1990-01-01,M,Green
+4,Jane,Smith,Chicago,1995-12-01,F,Brown
+5,John,Smith,Chicago,2000-05-03,M,Blue
+6,Jean,Denis,Paris,2000-05-03,M,Blue
+7,Jeanne,Dupont,Paris,2000-05-03,F,Blue
+8,Georges,Dupont,Paris,1986-12-03,M,Blue
+9,Henry,Dupont,Paris,1919-12-03,M,Blue
+10,Marie,Dupont,Paris,1920-11-15,F,Blue
+11,Eric,Dupont,Paris,1920-05-06,M,Blue
+12,Hector,Dupont,Paris,1922-04-07,M,Blue
