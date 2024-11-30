@@ -138,11 +138,11 @@ class OptionTypeSelect(BaseOptionType):
 
 class OptionQualitativeColor(OptionTypeSelect):
     def __init__(self, name: str, label: str) -> None:
-        choices = [
+        choices = sorted([
             k
             for k in qualitative.__dict__.keys()
             if not (k.startswith("_") or k.startswith("swatches") or k.endswith("_r"))
-        ]
+        ])
         super().__init__(name, label, choices, default=qualitative.Vivid, allow_empty_value=False)
 
     def render(self, value, result_columns: List[str]):
