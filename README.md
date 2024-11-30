@@ -10,6 +10,7 @@
 **Table of Contents**
 
 - [Colvert](#colvert)
+  - [Charts](#charts)
   - [Installation](#installation)
   - [Usage](#usage)
   - [Documentation](#documentation)
@@ -23,7 +24,9 @@
 
 It's a web frontend running on top of DuckDB. It's support SQL queries and visualization using Plotly. Even if it's a web frontend it's designed to be used locally on your machine like a Jupyter notebook.
 
-It's support loading data from CSV, Parquet, and JSON files.
+It's support loading data from CSV, Parquet, JSON files and directly from Hugging Face.
+
+## Charts
 
 ![Table screenshot](colvert/docs/charts/table/table.png)
 ![Pie chart screenshot](colvert/docs/charts/pie/pie.png)

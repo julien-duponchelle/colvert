@@ -73,8 +73,8 @@ async def open_browser(app: aiohttp.web.Application):
     help="Table to load the file into",
 )
 @click.option("--database", type=str, help="Database file to use, by default it's in-memory", default=":memory:")
-@click.argument("files", type=click.File("rb"), nargs=-1)
-def open(port: int, host: str, files: List[click.File], no_browser: bool, table: str, database: str):
+@click.argument("files", type=str, nargs=-1)
+def open(port: int, host: str, files: List[str], no_browser: bool, table: str, database: str):
     """
     Load a file and start the UI
     """
@@ -90,9 +90,9 @@ def open(port: int, host: str, files: List[click.File], no_browser: bool, table:
     logging.info(f"UI listening on http://{host}:{port}")
 
     async def load_files(app: aiohttp.web.Application):
-        logging.info(f"Loading files {', '.join(file.name for file in files)}")
+        logging.info(f"Loading files {', '.join(file for file in files)}")
         try:
-            await app["db"].load_files([file.name for file in files], table=table)
+            await app["db"].load_files([file for file in files], table=table)
         except ValueError as e:
             logging.error(e)
             # Send a signal to ourselves to stop the server

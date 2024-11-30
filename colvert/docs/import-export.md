@@ -106,3 +106,13 @@ colvert open --table=dataset my-dataset-1.parquet  my-dataset-2.parquet
 ```
 
 If no table name is provided a table name will be generated based on the files name using their common prefix.
+
+## Hugging Face 
+
+Colvert supports importing data from hugging face using the hf:// scheme.
+
+```bash
+colvert open --table=dataset 'hf://datasets/datasets-examples/doc-formats-csv-1/data.csv'
+```
+
+More informations on  [DuckDB blog](https://duckdb.org/2024/05/29/access-150k-plus-datasets-from-hugging-face-with-duckdb.html)
