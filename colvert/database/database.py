@@ -19,6 +19,8 @@ class Database:
             raise OSError(e)
         self._db.install_extension("autocomplete")
         self._db.load_extension("autocomplete")
+        self._db.install_extension("httpfs")
+        self._db.load_extension("httpfs")
 
     async def load_files(self, files: List[str], table: Optional[str] = None) -> None:
         if len(files) == 0:
