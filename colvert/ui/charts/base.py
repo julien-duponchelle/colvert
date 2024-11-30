@@ -33,6 +33,9 @@ class Base:
             val = options.get(opt.name)
             if val is not None and val != "":
                 self.user_options[opt.name] = opt.convert(val)
+            elif opt.default is not None:
+                self.user_options[opt.name] = opt.default
+                
 
     def _validate(self):
         """

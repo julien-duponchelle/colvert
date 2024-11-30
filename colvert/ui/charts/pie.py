@@ -3,7 +3,7 @@ import pandas
 import plotly.express as px
 
 from .base import Base, Result
-from .types import OptionTypeFloat, OptionTypeString
+from .types import OptionQualitativeColor, OptionTypeFloat, OptionTypeString
 
 
 class Pie(Base):
@@ -14,6 +14,7 @@ class Pie(Base):
     options = [
         OptionTypeString("title", "Title"),
         OptionTypeFloat("hole", "Hole", default=0, step=0.1, min=0, max=1),
+        OptionQualitativeColor(name="color_discrete_sequence", label="Color theme"),
     ]
 
     async def render(self,result: Result, df: pandas.DataFrame) -> str:

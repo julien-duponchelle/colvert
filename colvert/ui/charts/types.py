@@ -1,6 +1,8 @@
 import html
 from typing import List
 
+from plotly.express.colors import qualitative
+
 
 class BaseOptionType:
     def __init__(self, name: str, label: str, default=None) -> None:
@@ -95,3 +97,59 @@ class OptionTypeResultColumn(BaseOptionType):
         out += "</select>"
 
         return out
+    
+
+class OptionTypeSelect(BaseOptionType):
+    """
+    And html <select>
+    """
+    def __init__(self, name: str, label: str, choices: List[str], default=None, allow_empty_value=False) -> None:
+        super().__init__(name, label, default)
+        self._choices = choices
+        self._allow_empty_value = allow_empty_value
+        if self._allow_empty_value is False and self.default is None:
+            raise ValueError("The default value must be set if allow_empty_value is False")
+
+    def render(self, value, result_columns: List[str]):
+        out = super().render(value, result_columns)
+        out += '<select autocomplete="on"'
+        out += f' id="{self.name}"'
+        out += f' name="{self.name}"'
+        out += ' class="form-control"'
+        out += ' onchange="document.getElementById(\'results\').dispatchEvent(new Event(\'sql-change\'))"'
+        out += ">"
+
+        if self.default and (value is None or len(value) == 0):
+            value = self.default
+
+        if self._allow_empty_value:
+            out += '<option value=""></option>'            
+        for choice in self._choices:
+            if value == choice:
+                selected = "selected"
+            else:
+                selected = ""
+            out += f"<option value=\"{choice}\" {selected}>{choice}</option>"
+
+        out += "</select>"
+
+        return out
+
+
+class OptionQualitativeColor(OptionTypeSelect):
+    def __init__(self, name: str, label: str) -> None:
+        choices = [
+            k
+            for k in qualitative.__dict__.keys()
+            if not (k.startswith("_") or k.startswith("swatches") or k.endswith("_r"))
+        ]
+        super().__init__(name, label, choices, default=qualitative.Vivid, allow_empty_value=False)
+
+    def render(self, value, result_columns: List[str]):
+        for k,v in qualitative.__dict__.items():
+            if value == v:
+                value = k
+        return super().render(value, result_columns)
+
+    def convert(self, value: str) -> str:
+        return qualitative.__dict__[value]
