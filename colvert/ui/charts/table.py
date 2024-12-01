@@ -8,7 +8,7 @@ class Table(Base):
     limit = 1000
     example = "SELECT * FROM table"
     title = "Table"
-    pattern = ['...']
+    patterns = [['...']]
     options = {
     }
 

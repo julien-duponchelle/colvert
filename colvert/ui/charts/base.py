@@ -13,9 +13,11 @@ class Base:
     options = {}
 
     def __init__(self, request: Request, result: Result, options: Dict[str, Any]) -> None:
-        if not hasattr(self, "pattern"):
-            self.pattern = ['NUMBER', 'STRING', '*'] 
-            raise NotImplementedError("pattern is required")
+        if not hasattr(self, "patterns"):
+            self.patterns = ['NUMBER', 'STRING', '*'] 
+            raise NotImplementedError("patterns is required")
+        if len(self.patterns) == 0:
+            raise NotImplementedError("patterns is required")
         if not hasattr(self, "title"):
             self.title = "Title"
             raise NotImplementedError("title is required")
@@ -43,20 +45,33 @@ class Base:
 
         Raise ValueError if the result is not valid.
         """
-        if len(self._result.column_names) != 2 and self.pattern[-1:] != ["..."]:
-            raise ValueError(f"{self.title} need exactly {len(self.pattern)} columns.\nExample: {self.example}")
+        first_pattern = self.patterns[0]
+        if len(self._result.column_names) != 2 and first_pattern[-1:] != ["..."]:
+            raise ValueError(f"{self.title} need exactly {len(first_pattern)} columns.\nExample: {self.example}")
     
-        for i, pattern in enumerate(self.pattern):
-            if pattern == "*":
-                continue
-            elif pattern == "...":
+        error = None
+        for pattern in self.patterns:
+            error = self._validate_pattern(pattern)
+            if not error:
                 break
-            elif self._result.column_types[i] != pattern:
-                raise ValueError(f"{self.title} need a {pattern} column as column {i+1} got {self._result.column_types[i]}.\nExample: {self.example}")
+        if error:
+            raise ValueError(error)
+
         self._df = self._result.limit(self.limit + 1).df()
         if len(self._df) > self.limit:
             raise ValueError(f"{self.title} need max {self.limit} rows.")
         return True
+    
+    def _validate_pattern(self, pattern):
+        for i, field in enumerate(pattern):
+            if field == "*":
+                continue
+            elif field == "...":
+                break
+            elif self._result.column_types[i] != field:
+                return f"{self.title} need a {field} column as column {i+1} got {self._result.column_types[i]}.\nExample: {self.example}"
+        return None
+
 
     async def build(self) -> str:
         self._validate()

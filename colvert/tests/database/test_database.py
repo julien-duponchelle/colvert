@@ -103,7 +103,7 @@ class TestDatabase:
     @pytest.mark.asyncio
     async def test_describe(self, db):
         res = await db.describe("test")
-        assert len(res) == 7
+        assert len(res) == 9
         assert res[0]['column_name'] == "Id"
 
     @pytest.mark.asyncio
