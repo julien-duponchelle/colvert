@@ -8,81 +8,8 @@
 <script src="/static/vs/loader.js"></script>
 <script>
     require.config({ paths: { vs: '/static/vs' } });
-    require(['vs/editor/editor.main'], function () {
-        monaco.editor.defineTheme("colvertTheme", {
-            base: "vs",
-            inherit: true,
-            rules: [
-                { token: "operator", foreground: "FF0000" },
-                { token: "keyword", foreground: "004d26"},
-                { token: "number", foreground: "0000FF"},
-            ],
-            colors: {},
-        });
-        editor = monaco.editor.create(document.getElementById('search'), {
-            theme: 'colvertTheme',
-            value: {{ query| tojson }},
-            language: 'sql',
-            lineNumbers: false,
-            minimap: { enabled: false },
-            automaticLayout: true,
-            wordWrap: 'on',
-            contextmenu: false,
-            scrollbar: { vertical: 'hidden' },
-            renderLineHighlight: 'none',
-            padding: { top: 10, bottom: 10 },
-            lineDecorationsWidth: 0,
-            overviewRulerLanes: 0,
-            fontSize: 15,
-            wordBasedSuggestions: "off",
-            quickSuggestions: {
-                other: true,
-                strings: true
-            }
-        });
-        editor.onDidChangeModelContent(function () {
-            const input = document.querySelector('input[name=q]');
-            input.value = editor.getValue();
-            runQueryIfAutoRun();
-        });
-
-        monaco.languages.registerCompletionItemProvider("sql", {
-            provideCompletionItems: function (model, position) {
-                return new Promise(function (resolve, reject) {
-                    var textUntilPosition = model.getValueInRange({
-                        startLineNumber: 1,
-                        startColumn: 1,
-                        endLineNumber: position.lineNumber,
-                        endColumn: position.column
-                    });
-                    fetch('/completion', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            q: textUntilPosition
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        var suggestions = data.map(function (suggestion) {
-                            return  {
-                                label: suggestion['label'],
-                                insertText: suggestion['text'],
-                                kind: Reflect.get(monaco.languages.CompletionItemKind, suggestion['kind']),
-                            };
-                        });
-                        resolve({ suggestions: suggestions });
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        reject({ suggestions: [] })
-                    });
-                });
-            }
-        });
-    });
+</script>
+<script>
     function runQuery() {
         const results = document.getElementById('results');
         results.dispatchEvent(new Event('sql-change'));
@@ -93,7 +20,7 @@
         }
     }
     // An HX-Trigger event to disable auto-run
-    document.body.addEventListener("disableAutoRun", function(evt){
+    document.body.addEventListener("disableAutoRun", function (evt) {
         document.querySelector('input[name=auto-run]').checked = false;
         hideRunButtonIfAutoRun();
     });
@@ -119,50 +46,34 @@
 </script>
 
 <div class="row">
-<div class="col-s-12 col-lg-3">
-    <div id="form" class="card">
-        <input
-            type="hidden"
-            name="q"
-            value="{{ query }}"
-        >
-        <div class="card-body">
-            <label for="chart" class="form-label">Chart type</label>
-            <select name="chart" class="form-select" onchange="runQueryIfAutoRun();toggleSideBySideCheckbox()">
-                <option value="table">Table</option>
-                <option value="pie">Pie Chart</option>
-                <option value="line">Line Chart</option>
-            </select>
-            <div class="form-check form-switch" id="side-by-side-checkbox">
-                <input
-                    type="checkbox"
-                    name="side-by-side"
-                    class="form-check-input"
-                    onchange="runQueryIfAutoRun()"
-                />
-                <label for="side-by-side" class="form-check-label">Side by side</label>
+    <div class="col-s-12 col-lg-3">
+        <div id="form" class="card">
+            <div class="card-body">
+                <label for="chart" class="form-label">Chart type</label>
+                <select name="chart" class="form-select" onchange="runQueryIfAutoRun();toggleSideBySideCheckbox()">
+                    <option value="table">Table</option>
+                    <option value="pie">Pie Chart</option>
+                    <option value="line">Line Chart</option>
+                </select>
+                <div class="form-check form-switch" id="side-by-side-checkbox">
+                    <input type="checkbox" name="side-by-side" class="form-check-input"
+                        onchange="runQueryIfAutoRun()" />
+                    <label for="side-by-side" class="form-check-label">Side by side</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input type="checkbox" name="auto-run" class="form-check-input" role="switch" checked
+                        onchange="hideRunButtonIfAutoRun()" />
+                    <label for="auto-run" class="form-check-label">Auto run query</label>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Run query" onclick="runQuery()">
             </div>
-            <div class="form-check form-switch">
-                <input
-                    type="checkbox"
-                    name="auto-run"
-                    class="form-check-input"
-                    role="switch"
-                    checked
-                    onchange="hideRunButtonIfAutoRun()"
-                />
-                <label for="auto-run" class="form-check-label">Auto run query</label>
-            </div>
-            <input type="submit" class="btn btn-primary" value="Run query" onclick="runQuery()">
         </div>
     </div>
-</div>
 
-<div class="col-s-12 col-lg-9">
-    <div class="card">
-        <div id="search" style="height: 150px; overflow: auto; resize: vertical; card-body"></div>
+    <div class="col-s-12 col-lg-9">
+        {% set tab = 'tab-sql' %}
+        {% include "_query_form.html.j2" %}
     </div>
-</div>
 </div>
 
 <div class="row  gy-1">
@@ -170,13 +81,8 @@
         <div class="loading">
             <h3>Loading<span class="animated-dots"></span></h3>
         </div>
-        <div
-            id="results"
-            hx-post="/results"
-            hx-trigger="load, sql-change delay:500ms"
-            hx-swap="innerHtml"
-            hx-include="input, select"
-            >
+        <div id="results" hx-post="/results" hx-trigger="load, sql-change delay:500ms" hx-swap="innerHtml"
+            hx-include="input, select">
         </div>
     </span>
 </div>

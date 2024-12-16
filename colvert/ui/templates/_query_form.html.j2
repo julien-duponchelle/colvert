@@ -1,0 +1,111 @@
+<script>
+    require(['vs/editor/editor.main'], function () {
+        monaco.editor.defineTheme("colvertTheme", {
+            base: "vs",
+            inherit: true,
+            rules: [
+                { token: "operator", foreground: "FF0000" },
+                { token: "keyword", foreground: "004d26" },
+                { token: "number", foreground: "0000FF" },
+            ],
+            colors: {},
+        });
+        editor = monaco.editor.create(document.getElementById('search'), {
+            theme: 'colvertTheme',
+            value: {{ query| tojson }},
+        language: 'sql',
+        lineNumbers: false,
+        minimap: { enabled: false },
+        automaticLayout: true,
+        wordWrap: 'on',
+        contextmenu: false,
+        scrollbar: { vertical: 'hidden' },
+        renderLineHighlight: 'none',
+        padding: { top: 10, bottom: 10 },
+        lineDecorationsWidth: 0,
+        overviewRulerLanes: 0,
+        fontSize: 15,
+        wordBasedSuggestions: "off",
+        quickSuggestions: {
+        other: true,
+        strings: true
+    }
+    });
+    editor.onDidChangeModelContent(function () {
+        const input = document.querySelector('input[name=q]');
+        input.value = editor.getValue();
+        runQueryIfAutoRun();
+    });
+
+    monaco.languages.registerCompletionItemProvider("sql", {
+        provideCompletionItems: function (model, position) {
+            return new Promise(function (resolve, reject) {
+                var textUntilPosition = model.getValueInRange({
+                    startLineNumber: 1,
+                    startColumn: 1,
+                    endLineNumber: position.lineNumber,
+                    endColumn: position.column
+                });
+                fetch('/completion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        q: textUntilPosition
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        var suggestions = data.map(function (suggestion) {
+                            return {
+                                label: suggestion['label'],
+                                insertText: suggestion['text'],
+                                kind: Reflect.get(monaco.languages.CompletionItemKind, suggestion['kind']),
+                            };
+                        });
+                        resolve({ suggestions: suggestions });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        reject({ suggestions: [] })
+                    });
+            });
+        }
+    });
+});
+
+runQueryIfAutoRun();
+</script>
+
+<div id="query-form">
+    <input type="hidden" name="q" value="{{ query }}">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a href="#tab-sql" class="nav-link {% if tab == 'tab-sql' %}active{% endif %}" data-bs-toggle="tab"
+                    aria-selected="{% if tab == 'tab-sql' %}true{% else %}false{% endif %}" role="tab">SQL</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a href="#tab-prompt" class="nav-link {% if tab == 'tab-prompt' %}active{% endif %}" data-bs-toggle="tab"
+                    aria-selected="{%- if tab == 'tab-prompt' %}true{% else %}false{% endif -%}" role="tab"
+                    tabindex="-1">Prompt</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card">
+        <div class="tab-content">
+            <div id="tab-sql" class="tab-pane {% if tab == 'tab-sql' %}active{% endif %}" role="tabpanel">
+                <div id="search" style="height: 150px; overflow: auto; resize: vertical; card-body"></div>
+            </div>
+            <div id="tab-prompt" class="tab-pane {% if tab == 'tab-prompt' %}active{% endif %}" role="tabpanel">
+                <textarea id="prompt" name="prompt"
+                    style="width: 100%; height: 100px; resize: vertical; card-body">{{prompt}}</textarea>
+                <button class="btn btn-primary" hx-post="/sql-to-prompt" hx-method="POST" hx-target="#query-form"
+                    hx-include="[name=prompt],[name=q]">SQL to prompt</button>
+                <button class="btn btn-primary" hx-post="/prompt-to-sql" hx-method="POST" hx-target="#query-form"
+                    hx-include="[name=prompt],[name=q]">Prompt to SQL</button>
+            </div>
+        </div>
+    </div>
+</div>
