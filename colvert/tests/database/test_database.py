@@ -122,3 +122,20 @@ class TestDatabase:
         assert list(db._group_files(["test.csv", "world.csv"])) == [["test.csv"], ["world.csv"]]
         assert list(db._group_files(["test-001.csv", "test-002.csv"])) == [["test-001.csv", "test-002.csv"]]
         assert list(db._group_files(["user-group.csv", "user-invoice.csv"])) == [["user-group.csv"], ["user-invoice.csv"]]
+
+
+    @pytest.mark.asyncio
+    async def test_schema(self, db):
+        schema = await db.schema()
+        expected = "CREATE TABLE test (\n"
+        expected += "\t\"Id\" BIGINT,\n"
+        expected += "\t\"First Name\" VARCHAR,\n"
+        expected += "\t\"Last Name\" VARCHAR,\n"
+        expected += "\t\"City\" VARCHAR,\n"
+        expected += "\t\"Birth Date\" DATE,\n"
+        expected += "\t\"Gender\" VARCHAR,\n"
+        expected += "\t\"Eye Color\" VARCHAR,\n"
+        expected += "\t\"Salary\" BIGINT,\n"
+        expected += "\t\"Bonus\" BIGINT,\n"
+        expected += ");\n\n"
+        assert schema == expected

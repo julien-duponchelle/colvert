@@ -33,7 +33,7 @@ It's support loading data from CSV, Parquet, JSON files and directly from Huggin
 
 ## Installation
 
-We recommend installing `colvert` using `pipx`:
+We recommend installing `colvert` using `pipx` or `uvx`:
 ```console
 pipx install colvert
 ```

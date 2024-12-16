@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "adev.py",
             "console": "integratedTerminal",
-            "args": "runserver"
+            "args": "runserver",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

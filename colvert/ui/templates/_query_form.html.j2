@@ -102,9 +102,9 @@ runQueryIfAutoRun();
                 <textarea id="prompt" name="prompt"
                     style="width: 100%; height: 100px; resize: vertical; card-body">{{prompt}}</textarea>
                 <button class="btn btn-primary" hx-post="/sql-to-prompt" hx-method="POST" hx-target="#query-form"
-                    hx-include="[name=prompt],[name=q]">SQL to prompt</button>
+                    hx-include="[name=q]">SQL to prompt</button>
                 <button class="btn btn-primary" hx-post="/prompt-to-sql" hx-method="POST" hx-target="#query-form"
-                    hx-include="[name=prompt],[name=q]">Prompt to SQL</button>
+                    hx-include="[name=prompt]">Prompt to SQL</button>
             </div>
         </div>
     </div>

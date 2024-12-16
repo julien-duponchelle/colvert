@@ -2,3 +2,4 @@ dist
 .venv
 .tmp
 _version.py
+.env

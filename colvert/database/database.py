@@ -170,3 +170,19 @@ class Database:
                     val = val[1:-1]
             completions.append((kind, val))
         return completions
+    
+    async def schema(self) -> str:
+        """
+        Return the current database schema
+        """
+        schema = ""
+
+        for table in await self.tables():
+            schema += f"CREATE TABLE {table} (\n"
+            for col in await self.describe(table):
+                schema += f"\t\"{col['column_name']}\" {col['column_type']}"
+                if col['null'] != 'YES':
+                    schema += " NOT NULL"
+                schema += ",\n"
+            schema += ");\n\n"
+        return schema
