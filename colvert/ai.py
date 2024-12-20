@@ -1,13 +1,14 @@
-from openai import AsyncOpenAI
+from litellm import acompletion
 
 from .database import Database
 
 
 class AI:
-    def __init__(self):
-        self._client = AsyncOpenAI()
-
-
+    
+    async def _completion(self, prompt) -> str | None:
+        response = await acompletion(model="openai/gpt-4o", messages=[{"role": "user", "content": prompt}], stream=False)
+        return response.choices[0].message.content # type: ignore
+                               
     async def prompt_to_sql(self, db: Database, prompt):
         schema = await db.schema()
         prompt = f"""
@@ -22,12 +23,8 @@ class AI:
 
         Do not include any additional information or context.
         """
-        response = await self._client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if response.choices[0].message.content:
-            text = response.choices[0].message.content        
+        text = await self._completion(prompt)
+        if text:
             sql = text.split("```sql")[1].strip()
             sql = sql.replace("```", "")
             return sql
@@ -37,12 +34,9 @@ class AI:
     
     async def sql_to_prompt(self, sql):
         prompt = "Transform the following SQL query to a prompt for an AI model:\n" + sql
-        response = await self._client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if response.choices[0].message.content:
-            return response.choices[0].message.content.strip('"')
+        text = await self._completion(prompt)
+        if text:
+            return text.strip('"')
         else:
             return "Error: No response from the AI model."
     
