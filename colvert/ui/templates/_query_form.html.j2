@@ -79,6 +79,13 @@ runQueryIfAutoRun();
 </script>
 
 <div id="query-form">
+    {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+            Read more information on the <a href="/docs/ai">Colvert AI documentation</a>.
+        </div>
+    {% endif %}
+
     <input type="hidden" name="q" value="{{ query }}">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs" role="tablist">
