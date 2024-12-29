@@ -1,7 +1,9 @@
 import os
 from typing import List
 
-os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True" # Prevent litellm to fetch the data from internet
+os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = (
+    "True"  # Prevent litellm to fetch the data from internet
+)
 
 import litellm  # noqa: E402
 
@@ -12,11 +14,13 @@ class AIError(Exception):
     pass
 
 
-
-
 async def _completion(prompt) -> str | None:
     try:
-        response = await litellm.acompletion(model="openai/gpt-4o", messages=[{"role": "user", "content": prompt}], stream=False)
+        response = await litellm.acompletion(
+            model="openai/gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            stream=False,
+        )
     except litellm.exceptions.AuthenticationError as e:
         raise AIError("AI Error: Authentication Error") from e
     except litellm.exceptions.APIConnectionError as e:
@@ -31,8 +35,9 @@ async def _completion(prompt) -> str | None:
         raise AIError("AI Error: API Error") from e
     except Exception as e:
         raise AIError(f"AI Error: {e}") from e
-    return response.choices[0].message.content # type: ignore
-                            
+    return response.choices[0].message.content  # type: ignore
+
+
 async def prompt_to_sql(db: Database, prompt):
     schema = await db.schema()
     prompt = f"""
@@ -55,6 +60,7 @@ async def prompt_to_sql(db: Database, prompt):
     else:
         return "Error: No response from the AI model."
 
+
 async def sql_to_prompt(sql):
     prompt = "Transform the following SQL query to a prompt for an AI model:\n" + sql
     text = await _completion(prompt)
@@ -63,11 +69,13 @@ async def sql_to_prompt(sql):
     else:
         return "Error: No response from the AI model."
 
+
 async def test_model():
     """
     Test the connection to the AI model
     """
     return await _completion("Reply with a joke that the connection to model work")
+
 
 def list_models() -> List[str]:
     return litellm.utils.get_valid_models()
