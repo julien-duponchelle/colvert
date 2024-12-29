@@ -2,7 +2,7 @@ import asyncio
 
 import click
 
-from ..ai import AI, AIError
+from ..ai import AIError, list_models, test_model
 
 
 @click.group()
@@ -14,7 +14,7 @@ def models() -> None:
     """
     List supported AI models
     """
-    for model in AI().list_models():
+    for model in list_models():
         click.echo(model)
 
 
@@ -24,10 +24,9 @@ def test() -> None:
     Test the connection to the AI model
     """
     loop = asyncio.new_event_loop()
-    ai = AI()
     result = None
     try:
-        result = loop.run_until_complete(ai.test())
+        result = loop.run_until_complete(test_model())
         click.echo(result)
     except AIError as e:
         click.echo(e, err=True)
