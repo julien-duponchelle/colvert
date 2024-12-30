@@ -14,12 +14,17 @@ authors = [
   { name = "Julien Duponchelle", email = "julien@duponchelle.info" },
 ]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+  "Environment :: Web Environment",
+  "Framework :: AsyncIO",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Scientific/Engineering :: Visualization",
 ]
 
 [tool.hatch.metadata.hooks.requirements_txt]
