@@ -2,6 +2,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/colvert.svg)](https://pypi.org/project/colvert)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/colvert.svg)](https://pypi.org/project/colvert)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/colvert.svg)](https://pypi.org/project/colvert)
 
 ![Logo](colvert/ui/static/logo.png)
 
