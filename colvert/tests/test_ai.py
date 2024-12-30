@@ -13,13 +13,21 @@ def mock_settings_env_vars():
 
 
 @pytest.mark.asyncio
-async def test_prompt_to_sql(sample_db, ai):        
+async def test_prompt_to_sql_with_markdown(sample_db, ai):        
     ai.return_value = "```sql\nSELECT * FROM table```"
     result = await colvert.ai.prompt_to_sql(sample_db, "Hello")
     assert result == "SELECT * FROM table"
+
+@pytest.mark.asyncio
+async def test_prompt_to_sql(sample_db, ai):        
+    ai.return_value = "SELECT * FROM table"
+    result = await colvert.ai.prompt_to_sql(sample_db, "Hello")
+    assert result == "SELECT * FROM table"
+
 
 @pytest.mark.asyncio
 async def test_sql_to_prompt(ai):
     ai.return_value = "Hello"
     result = await colvert.ai.sql_to_prompt("SELECT * FROM table")
     assert result == "Hello"
+

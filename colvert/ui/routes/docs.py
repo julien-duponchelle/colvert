@@ -7,6 +7,7 @@ from aiohttp import web
 from markdown.extensions.admonition import AdmonitionExtension, AdmonitionProcessor
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.fenced_code import FencedCodeExtension
+from markdown.extensions.tables import TableExtension
 from markdown.extensions.toc import TocExtension
 
 routes = web.RouteTableDef()
@@ -42,7 +43,8 @@ def render(file: str) -> str:
             TocExtension(),
             FencedCodeExtension(),
             CodeHiliteExtension(),
-            ColvertAdmonitionExtension()
+            ColvertAdmonitionExtension(),
+            TableExtension(),
         ])
 
 @routes.get("/docs")

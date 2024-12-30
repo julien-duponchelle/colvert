@@ -2,20 +2,12 @@ import asyncio
 
 import click
 
-from ..ai import AIError, list_models, test_model
+from ..ai import AIError, test_model
 
 
 @click.group()
 def ai() -> None:
     pass
-
-@ai.command()
-def models() -> None:
-    """
-    List supported AI models
-    """
-    for model in list_models():
-        click.echo(model)
 
 
 @ai.command()

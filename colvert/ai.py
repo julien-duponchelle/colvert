@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = (
     "True"  # Prevent litellm to fetch the data from internet
@@ -8,6 +7,7 @@ os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = (
 import litellm  # noqa: E402
 
 from .database import Database  # noqa: E402
+from .settings import Settings  # noqa: E402
 
 
 class AIError(Exception):
@@ -15,11 +15,13 @@ class AIError(Exception):
 
 
 async def _completion(prompt) -> str | None:
+    settings = Settings()
     try:
         response = await litellm.acompletion(
-            model="openai/gpt-4o",
+            model=settings.get("ai", "model"),
             messages=[{"role": "user", "content": prompt}],
             stream=False,
+            api_key=settings.get("ai", "api_key"),
         )
     except litellm.exceptions.AuthenticationError as e:
         raise AIError("AI Error: Authentication Error") from e
@@ -53,13 +55,15 @@ async def prompt_to_sql(db: Database, prompt):
     Do not include any additional information or context.
     """
     text = await _completion(prompt)
-    if text:
+    if text is None:
+        return "Error: No response from the AI model."
+    elif "```sql" in text:
         sql = text.split("```sql")[1].strip()
         sql = sql.replace("```", "")
         return sql
     else:
-        return "Error: No response from the AI model."
-
+        return text
+        
 
 async def sql_to_prompt(sql):
     prompt = "Transform the following SQL query to a prompt for an AI model:\n" + sql
@@ -75,7 +79,3 @@ async def test_model():
     Test the connection to the AI model
     """
     return await _completion("Reply with a joke that the connection to model work")
-
-
-def list_models() -> List[str]:
-    return litellm.utils.get_valid_models()
