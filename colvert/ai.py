@@ -78,4 +78,4 @@ async def test_model():
     """
     Test the connection to the AI model
     """
-    return await _completion("Reply with a joke that the connection to model work")
+    return await _completion("First introduce yourself and state your name/version. Next create an SQL query that return the average size of a country")

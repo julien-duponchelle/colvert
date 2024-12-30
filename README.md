@@ -20,11 +20,15 @@
 
 **THIS PROJECT IS IN EARLY DEVELOPMENT**
 
+`colvert` is a tool for fast data exploration and visualization. Running on your machine you can explore large datasets using SQL an visualize them. 
+
 `colvert` is a Frontend for DuckDB a fast and lightweight in-memory database designed for analytical queries. It's design to be a simple and easy to use tool for data analysis and visualization. 
 
 It's a web frontend running on top of DuckDB. It's support SQL queries and visualization using Plotly. Even if it's a web frontend it's designed to be used locally on your machine like a Jupyter notebook.
 
 It's support loading data from CSV, Parquet, JSON files and directly from Hugging Face.
+
+Using [LiteLLM](https://github.com/BerriAI/litellm) for AI support allow usage of all 
 
 ## Charts
 
