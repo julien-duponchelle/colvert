@@ -3,3 +3,4 @@ dist
 .tmp
 _version.py
 .env
+uv.lock

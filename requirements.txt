@@ -8,4 +8,5 @@ plotly>=5.20.0
 pandas>=2.2.1 # Required by plotly express
 litellm>=1.53.7
 toml>=0.10.2
+platformdirs>=4.3.6
 markdown
