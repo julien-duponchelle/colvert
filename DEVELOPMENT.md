@@ -1,6 +1,8 @@
-# .env file
+# Record demo
 
-You can add your own OpenAI API key in the .env file.
-```env
-OPENAI_API_KEY=sk-dsfsfsfdsf
+
+You can record a demo of the app by running the following command:
+
+```
+python3 tools/record_demo.py
 ```
