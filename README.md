@@ -20,7 +20,7 @@
 
 **THIS PROJECT IS IN EARLY DEVELOPMENT**
 
-`colvert` is a tool for fast data exploration and visualization. Running on your machine you can explore large datasets using SQL an visualize them. 
+`colvert` is a tool for fast data exploration and visualization. Running on your machine you can explore large datasets using SQL an visualize them. AI generation of SQL queries is also supported.
 
 `colvert` is a Frontend for DuckDB a fast and lightweight in-memory database designed for analytical queries. It's design to be a simple and easy to use tool for data analysis and visualization. 
 
